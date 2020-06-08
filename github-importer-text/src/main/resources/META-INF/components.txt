@@ -1,0 +1,2 @@
+org.xwiki.contrib.githubimporter.internal.input.GithubImporterInputFilterStream
+org.xwiki.contrib.githubimporter.internal.input.GithubImporterInputFilterStreamFactory
