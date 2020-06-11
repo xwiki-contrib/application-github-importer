@@ -29,16 +29,17 @@ import org.xwiki.filter.test.integration.FilterTestSuite;
 import org.xwiki.test.annotation.AllComponents;
 
 /**
- * Run all tests found in the classpath. These {@code *.test} files must follow the conventions described in {@link
+ * [WIP] Run all tests found in the classpath. These {@code *.test} files must follow the conventions described in {@link
  * org.xwiki.filter.test.integration.TestDataParser}.
  *
  * @version $Id$
  */
 @RunWith(FilterTestSuite.class)
 @AllComponents
-@FilterTestSuite.Scope(value = "githubwiki/"/*, pattern = "attached.test"*/)
+@FilterTestSuite.Scope(value = "githubimporter/"/*, pattern = "attached.test"*/)
 public class GithubImporterIT
 {
+    // WIP
     public GithubImporterIT() throws URISyntaxException
     {
         // FIXME: remove when https://jira.xwiki.org/browse/XCOMMONS-1011 is fixed

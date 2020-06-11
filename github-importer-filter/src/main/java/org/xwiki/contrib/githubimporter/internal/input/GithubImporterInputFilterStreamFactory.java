@@ -19,52 +19,33 @@
  */
 package org.xwiki.contrib.githubimporter.internal.input;
 
-import java.io.IOException;
-
-import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.contrib.githubimporter.input.GithubImporterInputProperties;
 import org.xwiki.contrib.githubimporter.internal.GithubImporterFilter;
-import org.xwiki.filter.FilterException;
-import org.xwiki.filter.input.AbstractBeanInputFilterStream;
-import org.xwiki.filter.input.InputSource;
-import org.xwiki.git.script.GitScriptService;
-import org.xwiki.logging.Logger;
+import org.xwiki.filter.input.AbstractBeanInputFilterStreamFactory;
 
 /**
+ * Initialize Input stream for the GitHub Importer in Filter Streams Converter.
+ *
  * @version $Id$
  */
 @Component
 @Named(GithubImporterInputProperties.FILTER_STREAM_TYPE_STRING)
-@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class GithubImporterInputFilterStream
-    extends AbstractBeanInputFilterStream<GithubImporterInputProperties, GithubImporterFilter>
+@Singleton
+public class GithubImporterInputFilterStreamFactory
+    extends AbstractBeanInputFilterStreamFactory<GithubImporterInputProperties, GithubImporterFilter>
 {
-    @Inject
-    @Named("git")
-    GitScriptService gitScriptService;
-
-    @Inject
-    private Logger logger;
-
-    @Override
-    protected void read(Object filter, GithubImporterFilter filterHandler) throws FilterException
+    /**
+     * The default constructor.
+     */
+    public GithubImporterInputFilterStreamFactory()
     {
-        InputSource inputSource = this.properties.getSource();
-        if (inputSource != null) {
-            // WIP
-        } else {
-            throw new FilterException("Unspecified Input Source.");
-        }
-    }
+        super(GithubImporterInputProperties.FILTER_STREAM_TYPE);
 
-    @Override
-    public void close() throws IOException
-    {
-        this.properties.getSource().close();
+        setName("GitHub Importer input stream");
+        setDescription("Generates wiki events from Github Importer package.");
     }
 }

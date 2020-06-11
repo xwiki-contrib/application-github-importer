@@ -30,14 +30,13 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>github-importer-text</artifactId>
-  <name>GitHub Importer - Text Filter</name>
-  <description>Filter Streams extension to import GitHub Wiki</description>
+  <artifactId>github-importer-filter</artifactId>
+  <name>GitHub Importer Filter</name>
+  <description>Filter Streams extension to import GitHub Wikis</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>GitHub Importer Text</xwiki.extension.name>
+    <xwiki.extension.name>GitHub Importer Filter</xwiki.extension.name>
     <xwiki.extension.category>filter</xwiki.extension.category>
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
   </properties>
 
   <developers>
@@ -47,16 +46,12 @@
     </developer>
   </developers>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
-
   <dependencies>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-script</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-compress</artifactId>
@@ -81,13 +76,28 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-query-manager</artifactId>
+      <version>${platform.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-model</artifactId>
+      <version>${platform.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${platform.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.contrib</groupId>
       <artifactId>api-git</artifactId>
       <version>9.10</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.contrib.markdown</groupId>
+      <artifactId>syntax-markdown-markdown12</artifactId>
+      <version>8.6</version>
     </dependency>
     <!-- For XWiki syntax conversion -->
     <dependency>

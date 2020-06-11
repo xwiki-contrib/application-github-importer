@@ -55,6 +55,6 @@
   </developers>
 
   <modules>
-    <module>github-importer-text</module>
+    <module>github-importer-filter</module>
   </modules>
 </project>

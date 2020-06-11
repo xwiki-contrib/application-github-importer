@@ -38,25 +38,25 @@ import org.xwiki.properties.annotation.PropertyName;
 public class GithubImporterInputProperties extends DefaultFilterStreamProperties
 {
     /**
-     * The GitHub Importer Text format.
+     * The GitHub Importer Wiki format as a single String.
+     */
+    public static final String FILTER_STREAM_TYPE_STRING = "githubimporter+wiki";
+
+    /**
+     * Create a new System Type for the GitHub Importer.
      */
     // @TODO: Remove when updated in the Filter Streams Extension
-    private static final SystemType GITHUBIMPORTER = new SystemType("githubimporter");
+    private static final SystemType GITHUB_IMPORTER = new SystemType("githubimporter");
 
     /**
      * The Data Format for FilterStreamType.
      */
-    private static final String DATA_TEXT = "text";
-
-    /**
-     * The GitHub Wiki format as String.
-     */
-    public static final String FILTER_STREAM_TYPE_STRING = "github+text";
+    private static final String DATA_WIKI = "wiki";
 
     /**
      * The Filter Stream Type for GitHub Wiki.
      */
-    public static final FilterStreamType FILTER_STREAM_TYPE = new FilterStreamType(GITHUBIMPORTER, DATA_TEXT);
+    public static final FilterStreamType FILTER_STREAM_TYPE = new FilterStreamType(GITHUB_IMPORTER, DATA_WIKI);
 
     private InputSource source;
 
@@ -66,7 +66,7 @@ public class GithubImporterInputProperties extends DefaultFilterStreamProperties
      * @return input source of GitHub Wiki
      */
     @PropertyName("Source")
-    @PropertyDescription("The source to load the github wiki from")
+    @PropertyDescription("The source to load the GitHub Wiki from.")
     @PropertyMandatory
     public InputSource getSource()
     {
@@ -85,7 +85,7 @@ public class GithubImporterInputProperties extends DefaultFilterStreamProperties
      * @return the reference of the parent of all pages
      */
     @PropertyName("Parent")
-    @PropertyDescription("The reference of the parent of all pages")
+    @PropertyDescription("The parent to all pages which are going to be imported.")
     public EntityReference getParent()
     {
         return this.parent;
