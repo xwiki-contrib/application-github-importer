@@ -59,6 +59,10 @@ public class GithubImporterInputFilterStream
 
     private static final String KEY_MARKDOWN = "markdown/1.2";
 
+    private static final String KEY_URL_WIKI = ".wiki.git";
+
+    private static final String KEY_URL_GIT = "\\.git";
+
     @Inject
     private GitManager gitManager;
 
@@ -69,8 +73,11 @@ public class GithubImporterInputFilterStream
         if (inputSource != null) {
             File wikiRepoDirectory = null;
             if (inputSource instanceof URLInputSource) {
-                Repository repo = gitManager.getRepository(((URLInputSource) inputSource).getURL().toString(),
-                    KEY_GIT_DIRECTORY);
+                String urlString = ((URLInputSource) inputSource).getURL().toString();
+                if (!urlString.endsWith(KEY_URL_WIKI)) {
+                    urlString = readWikiFromRepository(urlString);
+                }
+                Repository repo = gitManager.getRepository(urlString, KEY_GIT_DIRECTORY);
                 wikiRepoDirectory = repo.getWorkTree();
             }
             if (wikiRepoDirectory != null) {
@@ -109,18 +116,19 @@ public class GithubImporterInputFilterStream
         try {
             String fileContents = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
             filterParams.put(WikiDocumentFilter.PARAMETER_CONTENT, fileContents);
-            try {
-                EntityReference reference = this.properties.getParent();
-                filterHandler.beginWikiSpace(reference.getName(), FilterEventParameters.EMPTY);
-                String pageName = file.getName().split(KEY_DOT)[0];
-                filterHandler.beginWikiDocument(pageName, filterParams);
-                filterHandler.endWikiDocument(pageName, filterParams);
-                filterHandler.endWikiSpace(reference.getName(), FilterEventParameters.EMPTY);
-            } catch (FilterException e) {
-                throw new FilterException("FilterException caught: " + e.getMessage());
-            }
-        } catch (IOException e) {
-            throw new FilterException("IOException caught: " + e.getMessage());
+            EntityReference reference = this.properties.getParent();
+            filterHandler.beginWikiSpace(reference.getName(), FilterEventParameters.EMPTY);
+            String pageName = file.getName().split(KEY_DOT)[0];
+            filterHandler.beginWikiDocument(pageName, filterParams);
+            filterHandler.endWikiDocument(pageName, filterParams);
+            filterHandler.endWikiSpace(reference.getName(), FilterEventParameters.EMPTY);
+        } catch (Exception e) {
+            throw new FilterException("Error: An Exception was thrown.", e);
         }
+    }
+
+    private String readWikiFromRepository(String urlString)
+    {
+        return urlString.split(KEY_URL_GIT)[0] + KEY_URL_WIKI;
     }
 }
