@@ -55,7 +55,7 @@ public class GithubImporterInputFilterStream
 {
     private static final String KEY_DOT = "\\.";
 
-    private static final String KEY_GIT_DIRECTORY = "GitHubImporterApplication";
+//    private static final String KEY_GIT_DIRECTORY = "GitHubImporterApplication";
 
     private static final String KEY_MARKDOWN = "markdown/1.2";
 
@@ -77,7 +77,7 @@ public class GithubImporterInputFilterStream
                 if (!urlString.endsWith(KEY_URL_WIKI)) {
                     urlString = readWikiFromRepository(urlString);
                 }
-                Repository repo = gitManager.getRepository(urlString, KEY_GIT_DIRECTORY);
+                Repository repo = gitManager.getRepository(urlString, getRepoName(urlString));
                 wikiRepoDirectory = repo.getWorkTree();
             }
             if (wikiRepoDirectory != null) {
@@ -130,5 +130,10 @@ public class GithubImporterInputFilterStream
     private String readWikiFromRepository(String urlString)
     {
         return urlString.split(KEY_URL_GIT)[0] + KEY_URL_WIKI;
+    }
+
+    private String getRepoName(String urlString)
+    {
+        return urlString.substring(urlString.lastIndexOf("/") + 1).split(KEY_URL_WIKI)[0];
     }
 }
