@@ -3,7 +3,7 @@
 Imports GitHub pages to XWiki by using the [Filter Streams Converter Application](https://extensions.xwiki.org/xwiki/bin/view/Extension/Filter%20Application).
 
 * Project Lead: [Hassan Ali](https://www.xwiki.org/xwiki/bin/view/XWiki/haxsen)
-* Documentation & Downloads: [XWiki Extension Page](https://extensions.xwiki.org/xwiki/bin/view/Extension/GitHub%20Importer%20Application/)
+* [Documentation & Downloads](https://extensions.xwiki.org/xwiki/bin/view/Extension/GitHub%20Importer%20Filter/)
 * [Issue Tracker](https://jira.xwiki.org/projects/GHIMPORT)
 * Communication: [Mailing List](http://dev.xwiki.org/xwiki/bin/view/Community/MailingLists), [IRC](http://dev.xwiki.org/xwiki/bin/view/Community/IRC)
 * [Development Practices](http://dev.xwiki.org)
