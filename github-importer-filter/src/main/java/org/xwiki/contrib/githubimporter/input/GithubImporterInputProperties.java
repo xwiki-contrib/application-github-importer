@@ -58,9 +58,30 @@ public class GithubImporterInputProperties extends DefaultFilterStreamProperties
      */
     public static final FilterStreamType FILTER_STREAM_TYPE = new FilterStreamType(GITHUB_IMPORTER, DATA_WIKI);
 
+    /**
+     * @see #getSource()
+     */
     private InputSource source;
 
+    /**
+     * @see #getParent()
+     */
     private EntityReference parent;
+
+    /**
+     * @see #isConvertSyntax()
+     */
+    private boolean convertSyntax;
+
+    /**
+     * @see #getUsername()
+     */
+    private String username = "";
+
+    /**
+     * @see #getAuthCode()
+     */
+    private String authCode = "";
 
     /**
      * @return input source of GitHub Wiki
@@ -102,5 +123,65 @@ public class GithubImporterInputProperties extends DefaultFilterStreamProperties
         } else {
             this.parent = parent;
         }
+    }
+
+    /**
+     * @return the syntax conversion choice
+     * @since 1.1
+     */
+    @PropertyName("XWiki syntax conversion")
+    @PropertyDescription("Convert syntax from Markdown to XWiki")
+    public boolean isConvertSyntax()
+    {
+        return this.convertSyntax;
+    }
+
+    /**
+     * @param convert the boolean to set conversion true or false
+     * @since 1.1
+     */
+    public void setConvertSyntax(boolean convert)
+    {
+        this.convertSyntax = convert;
+    }
+
+    /**
+     * @return the username to use for cloning protected repositories
+     * @since 1.1
+     */
+    @PropertyName("(Optional) Username")
+    @PropertyDescription("The username of GitHub.")
+    public String getUsername()
+    {
+        return this.username;
+    }
+
+    /**
+     * @param user the user to use for cloning repository
+     * @since 1.1
+     */
+    public void setUsername(String user)
+    {
+        this.username = user;
+    }
+
+    /**
+     * @return the authentication code used to clone protected repositories
+     * @since 1.1
+     */
+    @PropertyName("(Optional) Authentication Code")
+    @PropertyDescription("The oauth / token / password used to clone protected repositories.")
+    public String getAuthCode()
+    {
+        return this.authCode;
+    }
+
+    /**
+     * @param auth the auth or access code to use for cloning repository
+     * @since 1.1
+     */
+    public void setAuthCode(String auth)
+    {
+        this.authCode = auth;
     }
 }

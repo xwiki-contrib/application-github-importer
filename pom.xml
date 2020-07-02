@@ -26,7 +26,7 @@
   <parent>
     <groupId>org.xwiki.contrib</groupId>
     <artifactId>parent-platform</artifactId>
-    <version>8.4-8</version>
+    <version>12.4</version>
   </parent>
 
   <groupId>org.xwiki.contrib.github-importer</groupId>
@@ -44,7 +44,7 @@
     <connection>scm:git:git://github.com/xwiki-contrib/application-github-importer.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki-contrib/application-github-importer.git</developerConnection>
     <url>https://github.com/xwiki-contrib/application-github-importer/tree/master</url>
-    <tag>HEAD</tag>
+    <tag>github-importer-1.0</tag>
   </scm>
 
   <developers>
@@ -54,7 +54,41 @@
     </developer>
   </developers>
 
+<!--To avoid maven enforcer upper bound error-->
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-plain</artifactId>
+      <version>${rendering.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-observation-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-environment-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-script</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+  </dependencies>
+
   <modules>
     <module>github-importer-filter</module>
   </modules>
+
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>github-importer-test</module>
+      </modules>
+    </profile>
+  </profiles>
+
 </project>

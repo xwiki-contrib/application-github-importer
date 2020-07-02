@@ -22,6 +22,7 @@ package org.xwiki.contrib.githubimporter.internal.input;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 
 import javax.inject.Inject;
@@ -43,6 +44,10 @@ import org.xwiki.filter.input.InputSource;
 import org.xwiki.filter.input.URLInputSource;
 import org.xwiki.git.GitManager;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.rendering.parser.StreamParser;
+import org.xwiki.rendering.renderer.PrintRenderer;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 
 /**
  * @version $Id$
@@ -55,16 +60,26 @@ public class GithubImporterInputFilterStream
 {
     private static final String KEY_DOT = "\\.";
 
-//    private static final String KEY_GIT_DIRECTORY = "GitHubImporterApplication";
-
     private static final String KEY_MARKDOWN = "markdown/1.2";
+
+    private static final String KEY_XWIKI_SYNTAX = "xwiki/2.1";
 
     private static final String KEY_URL_WIKI = ".wiki.git";
 
     private static final String KEY_URL_GIT = "\\.git";
 
+    private static final String ERROR_EXCEPTION = "Error: An Exception was thrown.";
+
     @Inject
     private GitManager gitManager;
+
+    @Inject
+    @Named(KEY_XWIKI_SYNTAX)
+    private PrintRendererFactory xwiki21Factory;
+
+    @Inject
+    @Named(KEY_MARKDOWN)
+    private StreamParser mdParser;
 
     @Override
     protected void read(Object filter, GithubImporterFilter filterHandler) throws FilterException
@@ -77,7 +92,8 @@ public class GithubImporterInputFilterStream
                 if (!urlString.endsWith(KEY_URL_WIKI)) {
                     urlString = readWikiFromRepository(urlString);
                 }
-                Repository repo = gitManager.getRepository(urlString, getRepoName(urlString));
+                Repository repo = gitManager.getRepository(urlString, getRepoName(urlString),
+                    this.properties.getUsername(), this.properties.getAuthCode());
                 wikiRepoDirectory = repo.getWorkTree();
             }
             if (wikiRepoDirectory != null) {
@@ -103,7 +119,9 @@ public class GithubImporterInputFilterStream
         File[] docArray = directory.listFiles(fileFilter);
         if (docArray != null) {
             FilterEventParameters filterParams = new FilterEventParameters();
-            filterParams.put(filterHandler.PARAMETER_SYNTAX, KEY_MARKDOWN);
+            if (!this.properties.isConvertSyntax()) {
+                filterParams.put(filterHandler.PARAMETER_SYNTAX, KEY_MARKDOWN);
+            }
             for (File doc : docArray) {
                 readFile(doc, filterParams, filterHandler);
             }
@@ -115,6 +133,9 @@ public class GithubImporterInputFilterStream
     {
         try {
             String fileContents = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+            if (this.properties.isConvertSyntax()) {
+                fileContents = getConvertedContent(fileContents);
+            }
             filterParams.put(WikiDocumentFilter.PARAMETER_CONTENT, fileContents);
             EntityReference reference = this.properties.getParent();
             filterHandler.beginWikiSpace(reference.getName(), FilterEventParameters.EMPTY);
@@ -123,7 +144,7 @@ public class GithubImporterInputFilterStream
             filterHandler.endWikiDocument(pageName, filterParams);
             filterHandler.endWikiSpace(reference.getName(), FilterEventParameters.EMPTY);
         } catch (Exception e) {
-            throw new FilterException("Error: An Exception was thrown.", e);
+            throw new FilterException(ERROR_EXCEPTION, e);
         }
     }
 
@@ -135,5 +156,19 @@ public class GithubImporterInputFilterStream
     private String getRepoName(String urlString)
     {
         return urlString.substring(urlString.lastIndexOf("/") + 1).split(KEY_URL_WIKI)[0];
+    }
+
+    private String getConvertedContent(String content) throws FilterException
+    {
+        String convertedContent;
+        try {
+            DefaultWikiPrinter printer = new DefaultWikiPrinter();
+            PrintRenderer renderer = this.xwiki21Factory.createRenderer(printer);
+            mdParser.parse(new StringReader(content), renderer);
+            convertedContent = renderer.getPrinter().toString();
+        } catch (Exception e) {
+            throw new FilterException(ERROR_EXCEPTION, e);
+        }
+        return convertedContent;
     }
 }
