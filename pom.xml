@@ -44,7 +44,7 @@
     <connection>scm:git:git://github.com/xwiki-contrib/application-github-importer.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki-contrib/application-github-importer.git</developerConnection>
     <url>https://github.com/xwiki-contrib/application-github-importer/tree/master</url>
-    <tag>github-importer-1.0</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <developers>
@@ -54,41 +54,9 @@
     </developer>
   </developers>
 
-<!--To avoid maven enforcer upper bound error-->
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-syntax-plain</artifactId>
-      <version>${rendering.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-observation-api</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-environment-api</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-script</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-  </dependencies>
-
   <modules>
     <module>github-importer-filter</module>
+    <module>github-importer-ui</module>
   </modules>
-
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>github-importer-test</module>
-      </modules>
-    </profile>
-  </profiles>
 
 </project>

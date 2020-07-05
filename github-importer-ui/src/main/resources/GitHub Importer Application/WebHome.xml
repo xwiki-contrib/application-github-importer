@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="GitHub Importer Application.WebHome" locale="">
+  <web>GitHub Importer Application</web>
+  <name>WebHome</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>GitHub Importer Application</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}&#xd;
+#if ($request.convert)&#xd;
+  ## Set input and output types for filter&#xd;
+  #set($input = 'githubimporter+wiki')&#xd;
+  #set($output = 'xwiki+instance')&#xd;
+  &#xd;
+  ## Set input properties by going through each request parameter value&#xd;
+  #set($inputProperties = {})&#xd;
+  #foreach($parameterName in $request.parameterNames)&#xd;
+    #if ($parameterName.startsWith('githubimporter_properties_descriptor_'))&#xd;
+      #set($propertyName = $parameterName.substring(37))&#xd;
+      #set($paramValue = $request.get($parameterName))&#xd;
+      #if ($propertyName == 'source')&#xd;
+        #if ($paramValue.startsWith('http'))&#xd;
+          #set($paramValue = "url:${paramValue}")&#xd;
+        #end&#xd;
+      #end&#xd;
+      #if ($request.getParameter($parameterName) &amp;&amp; $request.getParameter($parameterName) != '')&#xd;
+        #set($void = $inputProperties.put($propertyName, $paramValue))&#xd;
+      #end&#xd;
+    #end&#xd;
+  #end&#xd;
+&#xd;
+  ## Set default options for XWiki output instance otherwise outputProperties will be null&#xd;
+  #set($outputProperties = {})&#xd;
+  #set($void = $outputProperties.put('verbose', 'true'))&#xd;
+  #set($void = $outputProperties.put('author', ''))&#xd;
+  #set($void = $outputProperties.put('groupPrefix', ''))&#xd;
+  #set($void = $outputProperties.put('groupSuffix', ''))&#xd;
+  #set($void = $outputProperties.put('saveComment', 'Import'))&#xd;
+  #set($void = $outputProperties.put('versionPreserved', 'true'))&#xd;
+  #set($void = $outputProperties.put('authorPreserved', 'true'))&#xd;
+  #set($void = $outputProperties.put('defaultReference', ''))&#xd;
+  #set($void = $outputProperties.put('defaultSyntax', ''))&#xd;
+  #set($void = $outputProperties.put('previousDeleted', 'true'))&#xd;
+  #set($void = $outputProperties.put('stoppedWhenSaveFail', 'true'))&#xd;
+  &#xd;
+  ## Set job in filter and start the conversion&#xd;
+  #set($job = $services.filter.convert($input, $inputProperties, $output, $outputProperties))&#xd;
+  #if ($job and $request.method == 'POST')&#xd;
+    {{info}}A job for the import has started.{{/info}}&#xd;
+  #end&#xd;
+#end&#xd;
+{{/velocity}}&#xd;
+&#xd;
+{{template name="job_macros.vm"/}}&#xd;
+&#xd;
+{{velocity output="false"}}&#xd;
+#set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js', true))&#xd;
+{{/velocity}}&#xd;
+&#xd;
+{{velocity}}&#xd;
+## Display job log of conversion&#xd;
+#if ($request.method == 'POST')&#xd;
+== Import Information ==&#xd;
+{{html}}&#xd;
+  &lt;div id="filter_job_status">&#xd;
+    #set($job = $services.filter.currentJob)&#xd;
+    #if ($job)&#xd;
+      #set ($jobStatusURL = $xwiki.getURL('FilterStreamJobJSON', 'get', $escapetool.url({&#xd;
+        'outputSyntax': 'plain'&#xd;
+      })))&#xd;
+      &lt;div class="xcontent job-status" data-url="$jobStatusURL">&#xd;
+        #set($jobStatus = $job.status)&#xd;
+        #set($finished = $jobStatus.state.name() == 'FINISHED')&#xd;
+        #if (!$finished)&#xd;
+          #displayJobProgressBar($jobStatus)&#xd;
+        #else&#xd;
+          #if (!$jobStatus.logTail.hasLogLevel('ERROR'))&#xd;
+            &lt;div class="box successmessage">&#xd;
+              Import completed.&#xd;
+            &lt;/div>&#xd;
+          #else&#xd;
+            &lt;div class="box errormessage">&#xd;
+              An error has occured during the import. Check the Job log for more information.&#xd;
+            &lt;/div>&#xd;
+          #end&#xd;
+        #end&#xd;
+        #displayJobStatusLog($jobStatus true)&#xd;
+      &lt;/div>&#xd;
+    #end&#xd;
+  &lt;/div>&#xd;
+{{/html}}&#xd;
+#end&#xd;
+{{/velocity}}&#xd;
+&#xd;
+{{html clean="false"}}&#xd;
+&lt;form class="xform" method="post">&#xd;
+  &lt;fieldset>&#xd;
+    &lt;legend>Import Options&lt;/legend>&#xd;
+    &lt;dl>&#xd;
+      &lt;dt>&#xd;
+        &lt;label for="githubimporter_input_source_type">Source Type&lt;/label>&#xd;
+        &lt;span class="xHint">The type of source.&lt;/span>&#xd;
+      &lt;/dt>&#xd;
+      &lt;dd>&#xd;
+        &lt;select name="input" id="githubimporter_sourcetype">&#xd;
+          &lt;option value="url" selected="selected">URL&lt;/option>&#xd;
+        &lt;/select>&#xd;
+      &lt;/dd>&#xd;
+      &lt;dt>&#xd;
+        &lt;label for="githubimporter_properties_descriptor_source">Source&lt;/label>&#xd;
+        &lt;span class="xHint">Path / Link of the source.&lt;/span>&#xd;
+      &lt;/dt>&#xd;
+      &lt;dd>&#xd;
+        &lt;input id="githubimporter_properties_descriptor_source" name="githubimporter_properties_descriptor_source" type="text" />&#xd;
+      &lt;/dd>&#xd;
+      &lt;dt>&#xd;
+        &lt;label for="githubimporter_properties_descriptor_parent">Parent Page&lt;/label>&#xd;
+        &lt;span class="xHint">Parent to set for the new pages.&lt;/span>&#xd;
+      &lt;/dt>&#xd;
+      &lt;dd>&#xd;
+        &lt;input id="githubimporter_properties_descriptor_parent" name="githubimporter_properties_descriptor_parent" type="text" />&#xd;
+      &lt;/dd>&#xd;
+      &lt;dt>&#xd;
+        &lt;label for="githubimporter_properties_descriptor_parent">Authentication Code&lt;/label>&#xd;
+        &lt;span class="xHint">(Optional for Public repository) The oauth / token / password used to clone protected repositories.&lt;/span>&#xd;
+      &lt;/dt>&#xd;
+      &lt;dd>&#xd;
+        &lt;input id="githubimporter_properties_descriptor_authCode" name="githubimporter_properties_descriptor_authCode" type="text" />&#xd;
+      &lt;/dd>&#xd;
+      &lt;dt>&#xd;
+        &lt;label for="githubimporter_properties_descriptor_parent">Username&lt;/label>&#xd;
+        &lt;span class="xHint">(Use only with password) The username used to clone protected repositories.&lt;/span>&#xd;
+      &lt;/dt>&#xd;
+      &lt;dd>&#xd;
+        &lt;input id="githubimporter_properties_descriptor_username" name="githubimporter_properties_descriptor_username" type="text" />&#xd;
+      &lt;/dd>&#xd;
+      &lt;dt>&#xd;
+        &lt;label for="githubimporter_properties_descriptor_convertSyntax">Convert Syntax&lt;/label>&#xd;
+        &lt;span class="xHint">Check true if you want to convert the syntax to XWiki syntax.&lt;/span>&#xd;
+      &lt;/dt>&#xd;
+      &lt;dd>&#xd;
+        &lt;input id="githubimporter_properties_descriptor_convertSyntax" name="githubimporter_properties_descriptor_convertSyntax" type="checkbox" value="true"/>&#xd;
+      &lt;/dd>&#xd;
+    &lt;/dl>&#xd;
+    &lt;p>&#xd;
+      &lt;span class="buttonwrapper">&#xd;
+        &lt;input class="button" type="submit" name="convert" value="Convert" />&#xd;
+      &lt;/span>&#xd;
+    &lt;/p>&#xd;
+  &lt;/fieldset>&#xd;
+&lt;/form>&#xd;
+{{/html}}</content>
+</xwikidoc>
