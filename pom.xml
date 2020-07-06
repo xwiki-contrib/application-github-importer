@@ -59,4 +59,12 @@
     <module>github-importer-ui</module>
   </modules>
 
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+<!--      <modules>-->
+<!--        <module>github-importer-test</module>-->
+<!--      </modules>-->
+    </profile>
+  </profiles>
 </project>

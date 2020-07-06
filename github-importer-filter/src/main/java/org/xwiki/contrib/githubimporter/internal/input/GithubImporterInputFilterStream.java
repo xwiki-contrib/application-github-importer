@@ -40,6 +40,7 @@ import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.event.model.WikiDocumentFilter;
 import org.xwiki.filter.input.AbstractBeanInputFilterStream;
+import org.xwiki.filter.input.FileInputSource;
 import org.xwiki.filter.input.InputSource;
 import org.xwiki.filter.input.URLInputSource;
 import org.xwiki.git.GitManager;
@@ -95,6 +96,11 @@ public class GithubImporterInputFilterStream
                 Repository repo = gitManager.getRepository(urlString, getRepoName(urlString),
                     this.properties.getUsername(), this.properties.getAuthCode());
                 wikiRepoDirectory = repo.getWorkTree();
+            } else if (inputSource instanceof FileInputSource) {
+                File file = ((FileInputSource) inputSource).getFile();
+                if (!file.getAbsolutePath().endsWith(".zip")) {
+                    wikiRepoDirectory = file;
+                }
             }
             if (wikiRepoDirectory != null) {
                 readWikiDirectory(wikiRepoDirectory, filterHandler);
