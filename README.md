@@ -7,7 +7,7 @@ Imports GitHub pages to XWiki by using the [Filter Streams Converter Application
 * [Issue Tracker](https://jira.xwiki.org/projects/GHIMPORT)
 * Communication: [Mailing List](http://dev.xwiki.org/xwiki/bin/view/Community/MailingLists), [IRC](http://dev.xwiki.org/xwiki/bin/view/Community/IRC)
 * [Development Practices](http://dev.xwiki.org)
-* Minimal XWiki version supported: XWiki 8.4
+* Minimal XWiki version supported: XWiki 12.4
 * License: LGPL 2.1
 * Translations: N/A
 * Sonar Dashboard: N/A
