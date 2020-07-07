@@ -31,7 +31,7 @@
 
   <groupId>org.xwiki.contrib.github-importer</groupId>
   <artifactId>github-importer</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.1</version>
   <name>Application GitHub Importer - Parent POM</name>
   <description>Parent POM for GitHub Importer modules</description>
   <packaging>pom</packaging>
