@@ -24,6 +24,7 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -128,8 +129,9 @@ public class GithubImporterInputFilterStream
             if (!this.properties.isConvertSyntax()) {
                 filterParams.put(filterHandler.PARAMETER_SYNTAX, KEY_MARKDOWN);
             }
-            for (File doc : docArray) {
-                readFile(doc, filterParams, filterHandler);
+            Arrays.sort(docArray);
+            for (File file : docArray) {
+                readFile(file, filterParams, filterHandler);
             }
         }
     }

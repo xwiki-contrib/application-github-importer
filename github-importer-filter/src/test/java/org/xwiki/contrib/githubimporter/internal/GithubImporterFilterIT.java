@@ -33,6 +33,6 @@ import org.xwiki.test.annotation.AllComponents;
 @RunWith(FilterTestSuite.class)
 @AllComponents
 @Scope(value = "githubimporter")
-public class IntegrationTests
+public class GithubImporterFilterIT
 {
 }

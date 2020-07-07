@@ -89,17 +89,17 @@ Reference-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/
 Inline {{code language="none"}}code{{/code}} has {{code language="none"}}back-ticks around{{/code}} it.
 
 {{code language="javascript"}}
-var s = "JavaScript syntax highlighting";&#xd;
+var s = "JavaScript syntax highlighting";
 alert(s);
 {{/code}}
 
 {{code language="python"}}
-s = "Python syntax highlighting"&#xd;
+s = "Python syntax highlighting"
 print s
 {{/code}}
 
 {{code language=""}}
-No language indicated, so no syntax highlighting. &#xd;
+No language indicated, so no syntax highlighting. 
 But let's throw in a &lt;b>tag&lt;/b>.
 {{/code}}
 
