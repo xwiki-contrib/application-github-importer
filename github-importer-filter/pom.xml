@@ -33,7 +33,7 @@
   <name>GitHub Importer Filter</name>
   <description>Filter Streams extension to import GitHub Wikis</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.8</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.7</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>GitHub Importer Filter</xwiki.extension.name>
     <xwiki.extension.category>filter</xwiki.extension.category>

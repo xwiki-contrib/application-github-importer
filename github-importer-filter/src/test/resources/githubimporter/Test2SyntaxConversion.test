@@ -2,36 +2,12 @@
 .expect|filter+xml
 .#------------------------------------------------------------------------------
 <wikiSpace name="GitImp">
-  <wikiDocument name="Test2">
-    <p>
-      <parameters>
-        <entry>
-          <string>content</string>
-          <string>T2</string>
-        </entry>
-      </parameters>
-    </p>
-  </wikiDocument>
-</wikiSpace>
-<wikiSpace name="GitImp">
   <wikiDocument name="Home-Tests">
     <p>
       <parameters>
         <entry>
           <string>content</string>
           <string>Tests</string>
-        </entry>
-      </parameters>
-    </p>
-  </wikiDocument>
-</wikiSpace>
-<wikiSpace name="GitImp">
-  <wikiDocument name="Test1">
-    <p>
-      <parameters>
-        <entry>
-          <string>content</string>
-          <string>= T1 =</string>
         </entry>
       </parameters>
     </p>
@@ -113,17 +89,17 @@ Reference-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/
 Inline {{code language="none"}}code{{/code}} has {{code language="none"}}back-ticks around{{/code}} it.
 
 {{code language="javascript"}}
-var s = "JavaScript syntax highlighting";
+var s = "JavaScript syntax highlighting";&#xd;
 alert(s);
 {{/code}}
 
 {{code language="python"}}
-s = "Python syntax highlighting"
+s = "Python syntax highlighting"&#xd;
 print s
 {{/code}}
 
 {{code language=""}}
-No language indicated, so no syntax highlighting. 
+No language indicated, so no syntax highlighting. &#xd;
 But let's throw in a &lt;b>tag&lt;/b>.
 {{/code}}
 
@@ -159,6 +135,30 @@ Asterisks
 ----
 
 Underscores</string>
+        </entry>
+      </parameters>
+    </p>
+  </wikiDocument>
+</wikiSpace>
+<wikiSpace name="GitImp">
+  <wikiDocument name="Test1">
+    <p>
+      <parameters>
+        <entry>
+          <string>content</string>
+          <string>= T1 =</string>
+        </entry>
+      </parameters>
+    </p>
+  </wikiDocument>
+</wikiSpace>
+<wikiSpace name="GitImp">
+  <wikiDocument name="Test2">
+    <p>
+      <parameters>
+        <entry>
+          <string>content</string>
+          <string>T2</string>
         </entry>
       </parameters>
     </p>

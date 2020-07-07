@@ -90,7 +90,7 @@ public class GithubImporterInputFilterStream
             File wikiRepoDirectory = null;
             if (inputSource instanceof URLInputSource) {
                 String urlString = ((URLInputSource) inputSource).getURL().toString();
-                if (!urlString.endsWith(KEY_URL_WIKI)) {
+                if (!urlString.endsWith(KEY_URL_WIKI) && urlString.endsWith(KEY_URL_GIT)) {
                     urlString = readWikiFromRepository(urlString);
                 }
                 Repository repo = gitManager.getRepository(urlString, getRepoName(urlString),
@@ -98,7 +98,7 @@ public class GithubImporterInputFilterStream
                 wikiRepoDirectory = repo.getWorkTree();
             } else if (inputSource instanceof FileInputSource) {
                 File file = ((FileInputSource) inputSource).getFile();
-                if (!file.getAbsolutePath().endsWith(".zip")) {
+                if (file.isDirectory()) {
                     wikiRepoDirectory = file;
                 }
             }
