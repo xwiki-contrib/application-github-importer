@@ -22,30 +22,26 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
   <parent>
     <groupId>org.xwiki.contrib.github-importer</groupId>
     <artifactId>github-importer</artifactId>
     <version>1.2-SNAPSHOT</version>
   </parent>
-
   <artifactId>github-importer-filter</artifactId>
   <name>GitHub Importer Filter</name>
-  <description>Filter Streams extension to import GitHub Wikis</description>
+  <description>Filter to import GitHub Pages as wiki pages</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.7</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>GitHub Importer Filter</xwiki.extension.name>
     <xwiki.extension.category>filter</xwiki.extension.category>
   </properties>
-
   <developers>
     <developer>
       <id>haxsen</id>
       <name>Hassan Ali</name>
     </developer>
   </developers>
-
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -136,5 +132,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
 </project>
