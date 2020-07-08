@@ -30,7 +30,7 @@
   <artifactId>github-importer-ui</artifactId>
   <name>GitHub Importer - UI</name>
   <packaging>xar</packaging>
-  <description>UI to Import GitHub pages into XWiki</description>
+  <description>UI to import GitHub pages into wiki pages</description>
   <properties>
     <xwiki.extension.features>org.xwiki.contrib.github-importer:github-importer-ui</xwiki.extension.features>
     <xwiki.extension.name>GitHub Importer Application</xwiki.extension.name>
