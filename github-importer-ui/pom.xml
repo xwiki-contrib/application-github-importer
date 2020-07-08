@@ -22,23 +22,19 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
   <parent>
     <groupId>org.xwiki.contrib.github-importer</groupId>
     <artifactId>github-importer</artifactId>
     <version>1.2-SNAPSHOT</version>
   </parent>
-
   <artifactId>github-importer-ui</artifactId>
   <name>GitHub Importer - UI</name>
   <packaging>xar</packaging>
-  <description>A Simplified UI to make the interaction user-friendly for the GitHub Importer.</description>
-
+  <description>UI to Import GitHub pages into XWiki</description>
   <properties>
     <xwiki.extension.features>org.xwiki.contrib.github-importer:github-importer-ui</xwiki.extension.features>
     <xwiki.extension.name>GitHub Importer Application</xwiki.extension.name>
   </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.xwiki.contrib.github-importer</groupId>
