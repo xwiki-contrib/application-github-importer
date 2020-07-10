@@ -49,7 +49,6 @@ import org.xwiki.filter.input.URLInputSource;
 import org.xwiki.git.GitManager;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.converter.Converter;
-import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
