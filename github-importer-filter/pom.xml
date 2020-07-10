@@ -45,18 +45,13 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-filter-ui</artifactId>
+      <artifactId>xwiki-platform-filter-script</artifactId>
       <version>${platform.version}</version>
-      <type>xar</type>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-filter-event-user</artifactId>
-        <version>${platform.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-filter-event-model</artifactId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${platform.version}</version>
     </dependency>
     <dependency>

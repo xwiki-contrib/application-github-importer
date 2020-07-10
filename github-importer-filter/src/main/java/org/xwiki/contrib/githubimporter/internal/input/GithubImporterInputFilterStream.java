@@ -29,12 +29,14 @@ import java.util.Arrays;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.xpn.xwiki.CoreConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.eclipse.jgit.lib.Repository;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.contrib.githubimporter.input.GithubImporterInputProperties;
 import org.xwiki.contrib.githubimporter.internal.GithubImporterFilter;
 import org.xwiki.filter.FilterEventParameters;
@@ -46,10 +48,12 @@ import org.xwiki.filter.input.InputSource;
 import org.xwiki.filter.input.URLInputSource;
 import org.xwiki.git.GitManager;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.rendering.converter.Converter;
 import org.xwiki.rendering.parser.StreamParser;
-import org.xwiki.rendering.renderer.PrintRenderer;
-import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxType;
 
 /**
  * @version $Id$
@@ -64,8 +68,6 @@ public class GithubImporterInputFilterStream
 
     private static final String KEY_MARKDOWN = "markdown/1.2";
 
-    private static final String KEY_XWIKI_SYNTAX = "xwiki/2.1";
-
     private static final String KEY_URL_WIKI = ".wiki.git";
 
     private static final String KEY_URL_GIT = "\\.git";
@@ -76,12 +78,10 @@ public class GithubImporterInputFilterStream
     private GitManager gitManager;
 
     @Inject
-    @Named(KEY_XWIKI_SYNTAX)
-    private PrintRendererFactory xwiki21Factory;
+    private CoreConfiguration coreConfiguration;
 
     @Inject
-    @Named(KEY_MARKDOWN)
-    private StreamParser mdParser;
+    private ComponentManager componentManager;
 
     @Override
     protected void read(Object filter, GithubImporterFilter filterHandler) throws FilterException
@@ -170,10 +170,13 @@ public class GithubImporterInputFilterStream
     {
         String convertedContent;
         try {
-            DefaultWikiPrinter printer = new DefaultWikiPrinter();
-            PrintRenderer renderer = this.xwiki21Factory.createRenderer(printer);
-            mdParser.parse(new StringReader(content), renderer);
-            convertedContent = renderer.getPrinter().toString();
+
+            Syntax defaultSyntax = coreConfiguration.getDefaultDocumentSyntax();
+            Converter converter = componentManager.getInstance(Converter.class);
+            WikiPrinter printer = new DefaultWikiPrinter();
+            converter.convert(new StringReader(content), new Syntax(SyntaxType.MARKDOWN, "1.2"), defaultSyntax,
+                    printer);
+            convertedContent = printer.toString();
         } catch (Exception e) {
             throw new FilterException(ERROR_EXCEPTION, e);
         }

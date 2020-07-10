@@ -20,24 +20,24 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="GitHub Importer Application.WebHome" locale="">
-  <web>GitHub Importer Application</web>
+<xwikidoc version="1.4" reference="GitHub Importer.WebHome" locale="">
+  <web>GitHub Importer</web>
   <name>WebHome</name>
   <language/>
-  <defaultLanguage/>
+  <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>GitHub Importer Application</title>
+  <title>GitHub Importer</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>true</hidden>
+  <hidden>false</hidden>
   <content>{{velocity}}&#xd;
-#if ($request.convert)&#xd;
+#if ($request.Import)&#xd;
   ## Set input and output types for filter&#xd;
   #set($input = 'githubimporter+wiki')&#xd;
   #set($output = 'xwiki+instance')&#xd;
@@ -95,7 +95,7 @@
   &lt;div id="filter_job_status">&#xd;
     #set($job = $services.filter.currentJob)&#xd;
     #if ($job)&#xd;
-      #set ($jobStatusURL = $xwiki.getURL('FilterStreamJobJSON', 'get', $escapetool.url({&#xd;
+      #set ($jobStatusURL = $xwiki.getURL('Code/FilterStreamJobJSON', 'get', $escapetool.url({&#xd;
         'outputSyntax': 'plain'&#xd;
       })))&#xd;
       &lt;div class="xcontent job-status" data-url="$jobStatusURL">&#xd;
@@ -125,11 +125,10 @@
 {{html clean="false"}}&#xd;
 &lt;form class="xform" method="post">&#xd;
   &lt;fieldset>&#xd;
-    &lt;legend>Import Options&lt;/legend>&#xd;
     &lt;dl>&#xd;
       &lt;dt>&#xd;
         &lt;label for="githubimporter_input_source_type">Source Type&lt;/label>&#xd;
-        &lt;span class="xHint">The type of source.&lt;/span>&#xd;
+        &lt;span class="xHint">This can be URL or File. (Only URL is supported in this version)&lt;/span>&#xd;
       &lt;/dt>&#xd;
       &lt;dd>&#xd;
         &lt;select name="input" id="githubimporter_sourcetype">&#xd;
@@ -138,14 +137,14 @@
       &lt;/dd>&#xd;
       &lt;dt>&#xd;
         &lt;label for="githubimporter_properties_descriptor_source">Source&lt;/label>&#xd;
-        &lt;span class="xHint">Path / Link of the source.&lt;/span>&#xd;
+        &lt;span class="xHint">Put repository URL here. (example: ##https://github.com/Haxsen/TestRepo.wiki.git##)&lt;/span>&#xd;
       &lt;/dt>&#xd;
       &lt;dd>&#xd;
         &lt;input id="githubimporter_properties_descriptor_source" name="githubimporter_properties_descriptor_source" type="text" />&#xd;
       &lt;/dd>&#xd;
       &lt;dt>&#xd;
         &lt;label for="githubimporter_properties_descriptor_parent">Parent Page&lt;/label>&#xd;
-        &lt;span class="xHint">Parent to set for the new pages.&lt;/span>&#xd;
+        &lt;span class="xHint">Parent to set for the new pages. All of the imported pages will be created under this parent page.&lt;/span>&#xd;
       &lt;/dt>&#xd;
       &lt;dd>&#xd;
         &lt;input id="githubimporter_properties_descriptor_parent" name="githubimporter_properties_descriptor_parent" type="text" />&#xd;
@@ -165,16 +164,16 @@
         &lt;input id="githubimporter_properties_descriptor_username" name="githubimporter_properties_descriptor_username" type="text" />&#xd;
       &lt;/dd>&#xd;
       &lt;dt>&#xd;
-        &lt;label for="githubimporter_properties_descriptor_convertSyntax">Convert Syntax&lt;/label>&#xd;
-        &lt;span class="xHint">Check true if you want to convert the syntax to XWiki syntax.&lt;/span>&#xd;
+        &lt;label for="githubimporter_properties_descriptor_convertSyntax">Convert to Default Syntax&lt;/label>&#xd;
+        &lt;span class="xHint">If true, the syntax of the pages content will be converted to default syntax; otherwise no conversion is applied.&lt;/span>&#xd;
       &lt;/dt>&#xd;
       &lt;dd>&#xd;
-        &lt;input id="githubimporter_properties_descriptor_convertSyntax" name="githubimporter_properties_descriptor_convertSyntax" type="checkbox" value="true"/>&#xd;
+        &lt;input id="githubimporter_properties_descriptor_convertSyntax" name="githubimporter_properties_descriptor_convertSyntax" type="checkbox" value="true" checked/>&#xd;
       &lt;/dd>&#xd;
     &lt;/dl>&#xd;
     &lt;p>&#xd;
       &lt;span class="buttonwrapper">&#xd;
-        &lt;input class="button" type="submit" name="convert" value="Convert" />&#xd;
+        &lt;input class="button" type="submit" name="Import" value="Import" />&#xd;
       &lt;/span>&#xd;
     &lt;/p>&#xd;
   &lt;/fieldset>&#xd;
