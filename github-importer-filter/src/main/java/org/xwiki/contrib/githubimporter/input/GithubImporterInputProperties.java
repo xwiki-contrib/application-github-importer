@@ -84,6 +84,11 @@ public class GithubImporterInputProperties extends DefaultFilterStreamProperties
     private String authCode = "";
 
     /**
+     * @see #isCreateHierarchy()
+     */
+    private boolean createHierarchy;
+
+    /**
      * @return input source of GitHub Wiki
      */
     @PropertyName("Source")
@@ -183,5 +188,25 @@ public class GithubImporterInputProperties extends DefaultFilterStreamProperties
     public void setAuthCode(String auth)
     {
         this.authCode = auth;
+    }
+
+    /**
+     * @return the hierarchy creation choice
+     * @since 1.2
+     */
+    @PropertyName("Create hierarchy of pages")
+    @PropertyDescription("Create the pages hierarchically according to their level defined in Sidebar")
+    public boolean isCreateHierarchy()
+    {
+        return this.createHierarchy;
+    }
+
+    /**
+     * @param createHierarchy the boolean to set hierarchy creation
+     * @since 1.2
+     */
+    public void setCreateHierarchy(boolean createHierarchy)
+    {
+        this.createHierarchy = createHierarchy;
     }
 }

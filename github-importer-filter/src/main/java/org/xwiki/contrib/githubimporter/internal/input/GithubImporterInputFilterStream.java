@@ -24,7 +24,11 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -47,6 +51,7 @@ import org.xwiki.filter.input.FileInputSource;
 import org.xwiki.filter.input.InputSource;
 import org.xwiki.filter.input.URLInputSource;
 import org.xwiki.git.GitManager;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.converter.Converter;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
@@ -103,7 +108,11 @@ public class GithubImporterInputFilterStream
                 }
             }
             if (wikiRepoDirectory != null) {
-                readWikiDirectory(wikiRepoDirectory, filterHandler);
+                if (this.properties.isCreateHierarchy()) {
+                    readHierarchy(wikiRepoDirectory, filterHandler);
+                } else {
+                    readWikiDirectory(wikiRepoDirectory, filterHandler);
+                }
             }
         } else {
             throw new FilterException("Input source is not supported: [" + this.properties.getSource() + "] "
@@ -124,18 +133,18 @@ public class GithubImporterInputFilterStream
             && !file.getName().startsWith("_"));
         File[] docArray = directory.listFiles(fileFilter);
         if (docArray != null) {
-            FilterEventParameters filterParams = new FilterEventParameters();
-            if (!this.properties.isConvertSyntax()) {
-                filterParams.put(filterHandler.PARAMETER_SYNTAX, KEY_MARKDOWN);
-            }
             Arrays.sort(docArray);
+            filterHandler.beginWikiSpace(this.properties.getParent().getName(), FilterEventParameters.EMPTY);
             for (File file : docArray) {
-                readFile(file, filterParams, filterHandler);
+                readFile(file, getSyntaxParameters(filterHandler), this.properties.getParent(),
+                        filterHandler);
             }
+            filterHandler.endWikiSpace(this.properties.getParent().getName(), FilterEventParameters.EMPTY);
         }
     }
 
-    private void readFile(File file, FilterEventParameters filterParams, GithubImporterFilter filterHandler)
+    private void readFile(File file, FilterEventParameters filterParams, EntityReference parent,
+                          GithubImporterFilter filterHandler)
         throws FilterException
     {
         try {
@@ -143,13 +152,11 @@ public class GithubImporterInputFilterStream
             if (this.properties.isConvertSyntax()) {
                 fileContents = getConvertedContent(fileContents);
             }
-            filterParams.put(WikiDocumentFilter.PARAMETER_CONTENT, fileContents);
-            EntityReference reference = this.properties.getParent();
-            filterHandler.beginWikiSpace(reference.getName(), FilterEventParameters.EMPTY);
             String pageName = file.getName().split(KEY_DOT)[0];
-            filterHandler.beginWikiDocument(pageName, filterParams);
-            filterHandler.endWikiDocument(pageName, filterParams);
-            filterHandler.endWikiSpace(reference.getName(), FilterEventParameters.EMPTY);
+            filterParams.put(WikiDocumentFilter.PARAMETER_CONTENT, fileContents);
+            EntityReference er = new EntityReference(pageName, EntityType.SPACE, parent);
+            filterHandler.beginWikiDocument(er.getName(), filterParams);
+            filterHandler.endWikiDocument(er.getName(), filterParams);
         } catch (Exception e) {
             throw new FilterException(ERROR_EXCEPTION, e);
         }
@@ -180,5 +187,90 @@ public class GithubImporterInputFilterStream
             throw new FilterException(ERROR_EXCEPTION, e);
         }
         return convertedContent;
+    }
+
+    private FilterEventParameters getSyntaxParameters(GithubImporterFilter filterHandler)
+    {
+        FilterEventParameters filterParams = new FilterEventParameters();
+        if (!this.properties.isConvertSyntax()) {
+            filterParams.put(filterHandler.PARAMETER_SYNTAX, KEY_MARKDOWN);
+        }
+        return filterParams;
+    }
+
+    private void readHierarchy(File directory, GithubImporterFilter filterHandler) throws FilterException
+    {
+        File sidebar = new File(directory, "_Sidebar.md");
+        if (!sidebar.exists() || !sidebar.canRead()) {
+            throw new FilterException("Sidebar is unreadable or does not exist.");
+        }
+        readSidebar(sidebar, directory, filterHandler);
+    }
+
+    private void readSidebar(File sidebar, File directory, GithubImporterFilter filterHandler) throws FilterException
+    {
+        ArrayList<EntityReference> hierarchy = new ArrayList<>();
+        hierarchy.add(this.properties.getParent());
+        try {
+            filterHandler.beginWikiSpace(hierarchy.get(hierarchy.size() - 1).getName(),
+                    FilterEventParameters.EMPTY);
+        } catch (FilterException e) {
+            e.printStackTrace();
+        }
+        final String[] parentName = {""};
+        try (Stream<String> linesStream = Files.lines(sidebar.toPath())) {
+            final AtomicInteger[] parentLevel = {new AtomicInteger()};
+            linesStream.forEach(line -> {
+                String pageDetailStart = line.substring(line.indexOf('['));
+    //                                String pageTitle = line.substring(1,
+    //                                        pageDetailStart.indexOf(']') - 1);
+                String pageLink = pageDetailStart.substring(pageDetailStart.indexOf(']') + 2);
+                String pageName = getPageName(pageLink);
+                if (!pageName.equals("")) {
+                    String pageFileName = pageName + ".md";
+                    File pageFile = new File(directory, pageFileName);
+
+                    int pageLevel = line.indexOf('*') < 0 ? line.indexOf('-') : line.indexOf('*');
+                    try {
+                        if (pageLevel == 0) {
+                            parentName[0] = null;
+                        } else if (pageLevel > parentLevel[0].get()) {
+                            EntityReference er = new EntityReference(parentName[0], EntityType.SPACE,
+                                    hierarchy.get(hierarchy.size() - 1));
+                            hierarchy.add(er);
+                            filterHandler.beginWikiSpace(hierarchy.get(hierarchy.size() - 1).getName(),
+                                    FilterEventParameters.EMPTY);
+                        } else if (pageLevel < parentLevel[0].get()) {
+                            filterHandler.endWikiSpace(hierarchy.get(hierarchy.size() - 1).getName(),
+                                    FilterEventParameters.EMPTY);
+                            hierarchy.remove(hierarchy.size() - 1);
+                        }
+                        readFile(pageFile, getSyntaxParameters(filterHandler), hierarchy.get(hierarchy.size() - 1),
+                                filterHandler);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    parentLevel[0].set(pageLevel);
+                    parentName[0] = pageName;
+                }
+            });
+        } catch (Exception e) {
+            throw new FilterException(ERROR_EXCEPTION, e);
+        }
+    }
+
+    private String getPageName(String pageLink)
+    {
+        String pageName = "";
+        if (pageLink.startsWith("http")) {
+            pageName = pageLink.substring(pageLink.lastIndexOf('/') + 1);
+            pageName = pageName.replace(")", "");
+        }
+        if (pageName.equals("wiki")) {
+            pageName = "Home";
+        }
+
+        return pageName;
     }
 }
