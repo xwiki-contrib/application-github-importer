@@ -62,9 +62,9 @@
   <profiles>
     <profile>
       <id>integration-tests</id>
-<!--      <modules>-->
-<!--        <module>github-importer-test</module>-->
-<!--      </modules>-->
+      <modules>
+        <module>github-importer-test</module>
+      </modules>
     </profile>
   </profiles>
 </project>
