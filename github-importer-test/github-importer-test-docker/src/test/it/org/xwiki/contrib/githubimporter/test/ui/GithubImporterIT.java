@@ -53,10 +53,10 @@ public class GithubImporterIT
         setup.loginAsSuperAdmin();
 
         // Go to Filter Application page
-//        ApplicationIndexHomePage applicationIndexHomePage = ApplicationIndexHomePage.gotoPage();
-//        ViewPage vp = applicationIndexHomePage.clickApplication("GitHub Importer");
+        ApplicationIndexHomePage applicationIndexHomePage = ApplicationIndexHomePage.gotoPage();
+        ViewPage vp = applicationIndexHomePage.clickApplication("GitHub Importer Application");
 
-        ViewPage vp = setup.gotoPage("Main.WebHome","GitHub Importer");
+//        ViewPage vp = setup.gotoPage("Main.WebHome","GitHub Importer");
 
         // Set input
 //        Select inputType = new Select(driver.findElement(By.id("filter_input_type")));
