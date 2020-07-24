@@ -51,8 +51,6 @@ import org.xwiki.filter.input.FileInputSource;
 import org.xwiki.filter.input.InputSource;
 import org.xwiki.filter.input.URLInputSource;
 import org.xwiki.git.GitManager;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.converter.Converter;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
@@ -75,6 +73,8 @@ public class GithubImporterInputFilterStream
     private static final String KEY_URL_WIKI = ".wiki.git";
 
     private static final String KEY_URL_GIT = "\\.git";
+
+    private static final String KEY_WEBHOME = "WebHome";
 
     private static final String ERROR_EXCEPTION = "Error: An Exception was thrown.";
 
@@ -136,14 +136,14 @@ public class GithubImporterInputFilterStream
             Arrays.sort(docArray);
             filterHandler.beginWikiSpace(this.properties.getParent().getName(), FilterEventParameters.EMPTY);
             for (File file : docArray) {
-                readFile(file, getSyntaxParameters(filterHandler), this.properties.getParent(),
+                readFile(file, getSyntaxParameters(filterHandler),
                         filterHandler);
             }
             filterHandler.endWikiSpace(this.properties.getParent().getName(), FilterEventParameters.EMPTY);
         }
     }
 
-    private void readFile(File file, FilterEventParameters filterParams, EntityReference parent,
+    private void readFile(File file, FilterEventParameters filterParams,
                           GithubImporterFilter filterHandler)
         throws FilterException
     {
@@ -154,9 +154,10 @@ public class GithubImporterInputFilterStream
             }
             String pageName = file.getName().split(KEY_DOT)[0];
             filterParams.put(WikiDocumentFilter.PARAMETER_CONTENT, fileContents);
-            EntityReference er = new EntityReference(pageName, EntityType.SPACE, parent);
-            filterHandler.beginWikiDocument(er.getName(), filterParams);
-            filterHandler.endWikiDocument(er.getName(), filterParams);
+            filterHandler.beginWikiSpace(pageName, filterParams);
+            filterHandler.beginWikiDocument(KEY_WEBHOME, filterParams);
+            filterHandler.endWikiDocument(KEY_WEBHOME, filterParams);
+            filterHandler.endWikiSpace(pageName, filterParams);
         } catch (Exception e) {
             throw new FilterException(ERROR_EXCEPTION, e);
         }
@@ -209,10 +210,10 @@ public class GithubImporterInputFilterStream
 
     private void readSidebar(File sidebar, File directory, GithubImporterFilter filterHandler) throws FilterException
     {
-        ArrayList<EntityReference> hierarchy = new ArrayList<>();
-        hierarchy.add(this.properties.getParent());
+        ArrayList<String> hierarchy = new ArrayList<>();
+        hierarchy.add(this.properties.getParent().getName());
         try {
-            filterHandler.beginWikiSpace(hierarchy.get(hierarchy.size() - 1).getName(),
+            filterHandler.beginWikiSpace(hierarchy.get(hierarchy.size() - 1),
                     FilterEventParameters.EMPTY);
         } catch (FilterException e) {
             e.printStackTrace();
@@ -222,8 +223,6 @@ public class GithubImporterInputFilterStream
             final AtomicInteger[] parentLevel = {new AtomicInteger()};
             linesStream.forEach(line -> {
                 String pageDetailStart = line.substring(line.indexOf('['));
-    //                                String pageTitle = line.substring(1,
-    //                                        pageDetailStart.indexOf(']') - 1);
                 String pageLink = pageDetailStart.substring(pageDetailStart.indexOf(']') + 2);
                 String pageName = getPageName(pageLink);
                 if (!pageName.equals("")) {
@@ -235,17 +234,15 @@ public class GithubImporterInputFilterStream
                         if (pageLevel == 0) {
                             parentName[0] = null;
                         } else if (pageLevel > parentLevel[0].get()) {
-                            EntityReference er = new EntityReference(parentName[0], EntityType.SPACE,
-                                    hierarchy.get(hierarchy.size() - 1));
-                            hierarchy.add(er);
-                            filterHandler.beginWikiSpace(hierarchy.get(hierarchy.size() - 1).getName(),
+                            hierarchy.add(parentName[0]);
+                            filterHandler.beginWikiSpace(hierarchy.get(hierarchy.size() - 1),
                                     FilterEventParameters.EMPTY);
                         } else if (pageLevel < parentLevel[0].get()) {
-                            filterHandler.endWikiSpace(hierarchy.get(hierarchy.size() - 1).getName(),
+                            filterHandler.endWikiSpace(hierarchy.get(hierarchy.size() - 1),
                                     FilterEventParameters.EMPTY);
                             hierarchy.remove(hierarchy.size() - 1);
                         }
-                        readFile(pageFile, getSyntaxParameters(filterHandler), hierarchy.get(hierarchy.size() - 1),
+                        readFile(pageFile, getSyntaxParameters(filterHandler),
                                 filterHandler);
                     } catch (Exception e) {
                         e.printStackTrace();

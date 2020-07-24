@@ -22,6 +22,7 @@ package org.xwiki.contrib.githubimporter.test.ui;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 import org.junit.Assert;
 import org.junit.jupiter.api.Order;
@@ -29,11 +30,12 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testcontainers.shaded.com.google.common.io.Resources;
-import org.xwiki.application.test.po.ApplicationIndexHomePage;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.panels.test.po.ApplicationsPanel;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
-import org.xwiki.test.ui.po.Select;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -47,16 +49,32 @@ public class GithubImporterIT
 {
     @Test
     @Order(1)
-    public void importGithubWiki(TestUtils setup, XWikiWebDriver driver)
-        throws IOException
+    public void assertInApplicationsPanel(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
+        // Navigate to the GitHub Importer by clicking in the Application Panel.
+        ApplicationsPanel applicationPanel = ApplicationsPanel.gotoPage();
+        ViewPage vp = applicationPanel.clickApplication("GitHub Importer");
+
+        // Verify we're on the right page!
+        Assert.assertEquals("GitHub Importer", vp.getMetaDataValue("space"));
+        Assert.assertEquals("WebHome", vp.getMetaDataValue("page"));
+    }
+
+    @Test
+    @Order(2)
+    public void importGithubWiki(TestUtils setup, XWikiWebDriver driver)
+        throws IOException, InterruptedException
+    {
+//        setup.loginAsSuperAdmin();
 
         // Go to Filter Application page
-        ApplicationIndexHomePage applicationIndexHomePage = ApplicationIndexHomePage.gotoPage();
-        ViewPage vp = applicationIndexHomePage.clickApplication("GitHub Importer Application");
+//        ApplicationIndexHomePage applicationIndexHomePage = ApplicationIndexHomePage.gotoPage();
+//        Assert.assertTrue(applicationIndexHomePage.containsApplication("GitHub Importer"));
+//        ViewPage vp = applicationIndexHomePage.clickApplication("GitHub Importer");
+//        ViewPage vp = applicationIndexHomePage.clickApplication("GitHub Importer");
 
-//        ViewPage vp = setup.gotoPage("Main.WebHome","GitHub Importer");
+//        ViewPage vp = setup.gotoPage("GitHub Importer","WebHome");
 
         // Set input
 //        Select inputType = new Select(driver.findElement(By.id("filter_input_type")));
@@ -74,17 +92,21 @@ public class GithubImporterIT
 //        outputType.selectByValue("xwiki+instance");
 
         // Start conversion
-        WebElement submit = driver.findElement(By.name("import"));
+        WebElement submit = driver.findElement(By.name("Import"));
         submit.click();
 
         // Wait for conversion (15 seconds)
         // @TODO: Use better implementation when available on Filter Module
-//        Thread.sleep(15*1000);
+        Thread.sleep(15*1000);
 
         // Check the output
-        ViewPage viewPage = setup.gotoPage("GithubImporterTestParent","Home");
+//        ViewPage viewPage = setup.gotoPage("GithubImporterTestParent","WebHome");
+//        viewPage = setup.gotoPage("Home","WebHome");
+        EntityReference importedReference = new DocumentReference("xwiki",
+            Arrays.asList("GithubImporterTestParent", "Home"), "WebHome");
+        ViewPage viewPage = setup.gotoPage(importedReference);
         String pageContent = viewPage.getContent();
-        URL resourceURL = getClass().getResource("/TestWikiRepository/Home.md");
+        URL resourceURL = getClass().getResource("/TestWikiRepository/Home.resource");
         String resourceContent = Resources.toString(resourceURL, StandardCharsets.UTF_8);
 //        String content = IOUtils.resourceToString(resourceURL.getFile(), Charset.defaultCharset());
 //        FileUtils.readFileToString();

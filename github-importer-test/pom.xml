@@ -42,12 +42,6 @@
         <!-- Don't run Checkstyle in test modules -->
         <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
         <xwiki.enforcer.skip>true</xwiki.enforcer.skip>
-        <xwiki.enforcer.enforce-upper-bounds.skip>false</xwiki.enforcer.enforce-upper-bounds.skip>
-        <!-- Force setting properties that are in contrib parent pom since we depend on xwiki-platform -->
-        <xwiki.nexus.serverId>xwiki-staging</xwiki.nexus.serverId>
-        <xwiki.nexus.nexusUrl>http://nexus.xwiki.org/nexus/</xwiki.nexus.nexusUrl>
-        <xwiki.nexus.skipLocalStaging>false</xwiki.nexus.skipLocalStaging>
-        <xwiki.release.jira.skip>true</xwiki.release.jira.skip>
     </properties>
 
 <!--    <modules>-->

@@ -175,7 +175,7 @@
         &lt;span class="xHint">Create the pages hierarchically according to their level defined in Sidebar.&lt;/span>&#xd;
       &lt;/dt>&#xd;
       &lt;dd>&#xd;
-        &lt;input id="githubimporter_properties_descriptor_createHierarchy" name="githubimporter_properties_descriptor_createHierarchy" type="checkbox" value="true" checked/>&#xd;
+        &lt;input id="githubimporter_properties_descriptor_createHierarchy" name="githubimporter_properties_descriptor_createHierarchy" type="checkbox" value="true"/>&#xd;
       &lt;/dd>&#xd;
     &lt;/dl>&#xd;
     &lt;p>&#xd;
