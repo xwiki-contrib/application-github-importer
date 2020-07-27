@@ -33,6 +33,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import com.xpn.xwiki.CoreConfiguration;
+import net.lingala.zip4j.core.ZipFile;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.eclipse.jgit.lib.Repository;
@@ -106,6 +107,9 @@ public class GithubImporterInputFilterStream
                 // if the input source is a directory, set it as wikiRepoDirectory
                 if (file.isDirectory()) {
                     wikiRepoDirectory = file;
+                } else if (file.getName().endsWith(".zip")) {
+                    File temporaryDirectory = environment.getTemporaryDirectory();
+                    readArchive(file.getAbsolutePath(), temporaryDirectory.getAbsolutePath());
                 }
             }
             if (wikiRepoDirectory != null) {
@@ -254,5 +258,15 @@ public class GithubImporterInputFilterStream
         }
 
         return pageName;
+    }
+
+    private void readArchive(String source, String destination) throws FilterException
+    {
+        try {
+            ZipFile zipFile = new ZipFile(source);
+            zipFile.extractAll(destination);
+        } catch (Exception e) {
+            throw new FilterException(ERROR_EXCEPTION, e);
+        }
     }
 }
