@@ -22,7 +22,6 @@ package org.xwiki.contrib.githubimporter.internal.input;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -43,6 +42,7 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.contrib.githubimporter.input.GithubImporterInputProperties;
 import org.xwiki.contrib.githubimporter.internal.GithubImporterFilter;
+import org.xwiki.environment.Environment;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.event.model.WikiDocumentFilter;
@@ -51,11 +51,6 @@ import org.xwiki.filter.input.FileInputSource;
 import org.xwiki.filter.input.InputSource;
 import org.xwiki.filter.input.URLInputSource;
 import org.xwiki.git.GitManager;
-import org.xwiki.rendering.converter.Converter;
-import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
-import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxType;
 
 /**
  * @version $Id$
@@ -70,7 +65,7 @@ public class GithubImporterInputFilterStream
 
     private static final String KEY_MARKDOWN = "markdown/1.2";
 
-    private static final String KEY_URL_WIKI = ".wiki.git";
+//    private static final String KEY_URL_WIKI = "\\.wiki\\.git";
 
     private static final String KEY_URL_GIT = "\\.git";
 
@@ -87,6 +82,11 @@ public class GithubImporterInputFilterStream
     @Inject
     private ComponentManager componentManager;
 
+    @Inject
+    private Environment environment;
+
+    private GithubImporterHelper githubImporterHelper;
+
     @Override
     protected void read(Object filter, GithubImporterFilter filterHandler) throws FilterException
     {
@@ -95,14 +95,15 @@ public class GithubImporterInputFilterStream
             File wikiRepoDirectory = null;
             if (inputSource instanceof URLInputSource) {
                 String urlString = ((URLInputSource) inputSource).getURL().toString();
-                if (!urlString.endsWith(KEY_URL_WIKI) && urlString.endsWith(KEY_URL_GIT)) {
-                    urlString = readWikiFromRepository(urlString);
-                }
+//                if (!urlString.endsWith(KEY_URL_WIKI) && urlString.endsWith(KEY_URL_GIT)) {
+//                    urlString = readWikiFromRepository(urlString);
+//                }
                 Repository repo = gitManager.getRepository(urlString, getRepoName(urlString),
                     this.properties.getUsername(), this.properties.getAuthCode());
                 wikiRepoDirectory = repo.getWorkTree();
             } else if (inputSource instanceof FileInputSource) {
                 File file = ((FileInputSource) inputSource).getFile();
+                // if the input source is a directory, set it as wikiRepoDirectory
                 if (file.isDirectory()) {
                     wikiRepoDirectory = file;
                 }
@@ -150,7 +151,7 @@ public class GithubImporterInputFilterStream
         try {
             String fileContents = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
             if (this.properties.isConvertSyntax()) {
-                fileContents = getConvertedContent(fileContents);
+                fileContents = githubImporterHelper.getConvertedContent(fileContents);
             }
             String pageName = file.getName().split(KEY_DOT)[0];
             filterParams.put(WikiDocumentFilter.PARAMETER_CONTENT, fileContents);
@@ -163,31 +164,14 @@ public class GithubImporterInputFilterStream
         }
     }
 
-    private String readWikiFromRepository(String urlString)
-    {
-        return urlString.split(KEY_URL_GIT)[0] + KEY_URL_WIKI;
-    }
+//    private String readWikiFromRepository(String urlString)
+//    {
+//        return urlString.split(KEY_URL_GIT)[0] + KEY_URL_WIKI;
+//    }
 
     private String getRepoName(String urlString)
     {
-        return urlString.substring(urlString.lastIndexOf("/") + 1).split(KEY_URL_WIKI)[0];
-    }
-
-    private String getConvertedContent(String content) throws FilterException
-    {
-        String convertedContent;
-        try {
-
-            Syntax defaultSyntax = coreConfiguration.getDefaultDocumentSyntax();
-            Converter converter = componentManager.getInstance(Converter.class);
-            WikiPrinter printer = new DefaultWikiPrinter();
-            converter.convert(new StringReader(content), new Syntax(SyntaxType.MARKDOWN, "1.2"), defaultSyntax,
-                    printer);
-            convertedContent = printer.toString();
-        } catch (Exception e) {
-            throw new FilterException(ERROR_EXCEPTION, e);
-        }
-        return convertedContent;
+        return urlString.substring(urlString.lastIndexOf("/") + 1).split(KEY_URL_GIT)[0];
     }
 
     private FilterEventParameters getSyntaxParameters(GithubImporterFilter filterHandler)
@@ -203,7 +187,8 @@ public class GithubImporterInputFilterStream
     {
         File sidebar = new File(directory, "_Sidebar.md");
         if (!sidebar.exists() || !sidebar.canRead()) {
-            throw new FilterException("Sidebar is unreadable or does not exist.");
+//            readWikiDirectory(directory, filterHandler);
+            throw new FilterException("Error reading hierarchy: Sidebar is unreadable or does not exist.");
         }
         readSidebar(sidebar, directory, filterHandler);
     }
