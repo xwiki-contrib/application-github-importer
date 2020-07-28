@@ -86,7 +86,8 @@ public class GithubImporterInputFilterStream
     @Inject
     private Environment environment;
 
-    private GithubImporterHelper githubImporterHelper;
+    @Inject
+    private GithubImporterSyntaxConverter githubImporterSyntaxConverter;
 
     @Override
     protected void read(Object filter, GithubImporterFilter filterHandler) throws FilterException
@@ -113,6 +114,9 @@ public class GithubImporterInputFilterStream
                 }
             }
             if (wikiRepoDirectory != null) {
+                if (wikiRepoDirectory.listFiles().length == 0) {
+                    throw new FilterException("The source is empty or does not exist.");
+                }
                 if (this.properties.isCreateHierarchy()) {
                     readHierarchy(wikiRepoDirectory, filterHandler);
                 } else {
@@ -155,7 +159,7 @@ public class GithubImporterInputFilterStream
         try {
             String fileContents = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
             if (this.properties.isConvertSyntax()) {
-                fileContents = githubImporterHelper.getConvertedContent(fileContents);
+                fileContents = githubImporterSyntaxConverter.getConvertedContent(fileContents);
             }
             String pageName = file.getName().split(KEY_DOT)[0];
             filterParams.put(WikiDocumentFilter.PARAMETER_CONTENT, fileContents);

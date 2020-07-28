@@ -48,9 +48,12 @@
     #if ($parameterName.startsWith('githubimporter_properties_descriptor_'))&#xd;
       #set($propertyName = $parameterName.substring(37))&#xd;
       #set($paramValue = $request.get($parameterName))&#xd;
-      #if ($propertyName == 'source')&#xd;
+      #if ($propertyName.startsWith('source'))&#xd;
         #if ($paramValue.startsWith('http'))&#xd;
           #set($paramValue = "url:${paramValue}")&#xd;
+        #else&#xd;
+          #set($propertyName = 'source')&#xd;
+          #set($paramValue = "file:${paramValue}")&#xd;
         #end&#xd;
       #end&#xd;
       #if ($request.getParameter($parameterName) &amp;&amp; $request.getParameter($parameterName) != '')&#xd;
@@ -132,18 +135,26 @@
       &lt;/dt>&#xd;
       &lt;dd>&#xd;
         &lt;select name="input" id="githubimporter_sourcetype">&#xd;
-          &lt;option value="url" selected="selected">URL&lt;/option>&#xd;
+          &lt;option value="url" selected="selected"&gt;URL&lt;/option>&#xd;
+          &lt;option value="file">FILE&lt;/option>&#xd;
         &lt;/select>&#xd;
       &lt;/dd>&#xd;
-      &lt;dt>&#xd;
-        &lt;label for="githubimporter_properties_descriptor_source">Source&lt;/label>&#xd;
-        &lt;span class="xHint">The repository URL (clone URL). (example: ##https://github.com/Haxsen/TestRepo.wiki.git##)&lt;/span>&#xd;
+      &lt;dt class="githubimporter_properties_descriptor_source">&#xd;
+        &lt;label for="githubimporter_properties_descriptor_source">Link&lt;/label>&#xd;
+        &lt;span class="xHint">Link of the repository. (e.g. https://github.com/Haxsen/TestRepo.wiki.git)&lt;/span>&#xd;
       &lt;/dt>&#xd;
-      &lt;dd>&#xd;
-        &lt;input id="githubimporter_properties_descriptor_source" name="githubimporter_properties_descriptor_source" type="text" />&#xd;
+      &lt;dd class="githubimporter_properties_descriptor_source">&#xd;
+        &lt;input id="githubimporter_properties_descriptor_source_input" name="githubimporter_properties_descriptor_source" type="text" />&#xd;
+      &lt;/dd>&#xd;
+      &lt;dt class="githubimporter_properties_descriptor_source_file hidden">&#xd;
+        &lt;label for="githubimporter_properties_descriptor_source_file">Path&lt;/label>&#xd;
+        &lt;span class="xHint">Path of the source file/folder. (e.g. /home/myuser/path/to/folder or E:\path\to\folder)&lt;/span>&#xd;
+      &lt;/dt>&#xd;
+      &lt;dd class="githubimporter_properties_descriptor_source_file hidden">&#xd;
+        &lt;input id="githubimporter_properties_descriptor_source_file_input" name="githubimporter_properties_descriptor_source_file" type="text" />&#xd;
       &lt;/dd>&#xd;
       &lt;dt>&#xd;
-        &lt;label for="githubimporter_properties_descriptor_parent">Parent / Root&lt;/label>&#xd;
+        &lt;label for="githubimporter_properties_descriptor_parent">Parent / Root Space&lt;/label>&#xd;
         &lt;span class="xHint">All of the imported pages will be created under this parent space.&lt;/span>&#xd;
       &lt;/dt>&#xd;
       &lt;dd>&#xd;
@@ -186,4 +197,117 @@
   &lt;/fieldset>&#xd;
 &lt;/form>&#xd;
 {{/html}}</content>
+  <object>
+    <name>GitHub Importer.WebHome</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>30f09d24-1888-4ba3-b601-1275691e6788</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>default</cache>
+    </property>
+    <property>
+      <code>require(['jquery'], function ($) {&#xd;
+        $('#githubimporter_sourcetype').change(function () {&#xd;
+        if ($(this).val() === 'file') {&#xd;
+        $('.githubimporter_properties_descriptor_source_file').removeClass('hidden');&#xd;
+        $('.githubimporter_properties_descriptor_source').addClass('hidden');&#xd;
+        $('#githubimporter_properties_descriptor_source_input').attr('name', '');&#xd;
+        $('#githubimporter_properties_descriptor_source_file_input').attr('name', 'githubimporter_properties_descriptor_source_file');&#xd;
+        } else {&#xd;
+        $('.githubimporter_properties_descriptor_source').removeClass('hidden');&#xd;
+        $('.githubimporter_properties_descriptor_source_file').addClass('hidden');&#xd;
+        $('#githubimporter_properties_descriptor_source_file_input').attr('name', '');&#xd;
+        $('#githubimporter_properties_descriptor_source_input').attr('name', 'githubimporter_properties_descriptor_source');&#xd;
+        }&#xd;
+        });&#xd;
+        });</code>
+    </property>
+    <property>
+      <name>SourceTypeJS</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
 </xwikidoc>

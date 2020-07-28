@@ -20,6 +20,9 @@
 package org.xwiki.contrib.githubimporter.internal.input;
 
 import com.xpn.xwiki.CoreConfiguration;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.filter.FilterException;
 import org.xwiki.rendering.converter.Converter;
@@ -37,7 +40,9 @@ import java.io.StringReader;
  * @version $Id$
  * @since 1.3
  */
-public class GithubImporterHelper
+@Component(roles = GithubImporterSyntaxConverter.class)
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+public class GithubImporterSyntaxConverter
 {
     @Inject
     private CoreConfiguration coreConfiguration;
