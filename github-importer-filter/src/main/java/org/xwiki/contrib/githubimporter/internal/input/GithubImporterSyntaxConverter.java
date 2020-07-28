@@ -35,7 +35,7 @@ import javax.inject.Inject;
 import java.io.StringReader;
 
 /**
- * Provides various methods to assist Github Importer.
+ * Provides methods for syntax conversion in GitHub Importer.
  *
  * @version $Id$
  * @since 1.3

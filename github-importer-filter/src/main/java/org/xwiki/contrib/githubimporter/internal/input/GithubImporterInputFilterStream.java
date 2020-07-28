@@ -72,6 +72,12 @@ public class GithubImporterInputFilterStream
 
     private static final String KEY_WEBHOME = "WebHome";
 
+    private static final String KEY_ZIP = ".zip";
+
+    private static final String KEY_FORWARD_SLASH = "/";
+
+    private static final String KEY_GITHUB_IMPORTER_TEMPDIR = "GithubImporter";
+
     private static final String ERROR_EXCEPTION = "Error: An Exception was thrown.";
 
     @Inject
@@ -108,9 +114,12 @@ public class GithubImporterInputFilterStream
                 // if the input source is a directory, set it as wikiRepoDirectory
                 if (file.isDirectory()) {
                     wikiRepoDirectory = file;
-                } else if (file.getName().endsWith(".zip")) {
-                    File temporaryDirectory = environment.getTemporaryDirectory();
-                    readArchive(file.getAbsolutePath(), temporaryDirectory.getAbsolutePath());
+                } else if (file.getName().endsWith(KEY_ZIP)) {
+                    String githubImporterTempDir = environment.getTemporaryDirectory().getAbsolutePath()
+                            + KEY_FORWARD_SLASH + KEY_GITHUB_IMPORTER_TEMPDIR;
+                    readArchive(file.getAbsolutePath(), githubImporterTempDir);
+                    wikiRepoDirectory = new File(githubImporterTempDir + KEY_FORWARD_SLASH
+                            + file.getName().split(KEY_ZIP)[0]);
                 }
             }
             if (wikiRepoDirectory != null) {
@@ -179,7 +188,7 @@ public class GithubImporterInputFilterStream
 
     private String getRepoName(String urlString)
     {
-        return urlString.substring(urlString.lastIndexOf("/") + 1).split(KEY_URL_GIT)[0];
+        return urlString.substring(urlString.lastIndexOf(KEY_FORWARD_SLASH) + 1).split(KEY_URL_GIT)[0];
     }
 
     private FilterEventParameters getSyntaxParameters(GithubImporterFilter filterHandler)

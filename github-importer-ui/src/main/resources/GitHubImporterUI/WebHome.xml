@@ -148,7 +148,7 @@
       &lt;/dd>&#xd;
       &lt;dt class="githubimporter_properties_descriptor_source_file hidden">&#xd;
         &lt;label for="githubimporter_properties_descriptor_source_file">Path&lt;/label>&#xd;
-        &lt;span class="xHint">Path of the source file/folder. (e.g. /home/myuser/path/to/folder or E:\path\to\folder)&lt;/span>&#xd;
+        &lt;span class="xHint">Path of the source file/folder. Only zip is supported as file. (e.g. /home/myuser/path/to/folder or E:\path\to\folder or /home/myuser/path/to/file.zip)&lt;/span>&#xd;
       &lt;/dt>&#xd;
       &lt;dd class="githubimporter_properties_descriptor_source_file hidden">&#xd;
         &lt;input id="githubimporter_properties_descriptor_source_file_input" name="githubimporter_properties_descriptor_source_file" type="text" />&#xd;
