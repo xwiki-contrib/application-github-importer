@@ -77,7 +77,7 @@
   #set($void = $outputProperties.put('stoppedWhenSaveFail', 'true'))&#xd;
   &#xd;
   ## Set job in filter and start the conversion&#xd;
-  #set($job = $services.filter.convert($input, $inputProperties, $output, $outputProperties))&#xd;
+  #set($job = $services.filter.startConvert($input, $inputProperties, $output, $outputProperties))&#xd;
   #if ($job and $request.method == 'POST')&#xd;
     {{info}}A job for the import has started.{{/info}}&#xd;
   #end&#xd;
@@ -98,7 +98,7 @@
   &lt;div id="filter_job_status">&#xd;
     #set($job = $services.filter.currentJob)&#xd;
     #if ($job)&#xd;
-      #set ($jobStatusURL = $xwiki.getURL('Code/FilterStreamJobJSON', 'get', $escapetool.url({&#xd;
+      #set ($jobStatusURL = $xwiki.getURL('GitHub Importer.Code.FilterStreamJobJSON', 'get', $escapetool.url({&#xd;
         'outputSyntax': 'plain'&#xd;
       })))&#xd;
       &lt;div class="xcontent job-status" data-url="$jobStatusURL">&#xd;
