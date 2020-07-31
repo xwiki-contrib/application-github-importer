@@ -35,7 +35,6 @@ import javax.inject.Named;
 import com.xpn.xwiki.CoreConfiguration;
 import net.lingala.zip4j.core.ZipFile;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.eclipse.jgit.lib.Repository;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
@@ -77,6 +76,8 @@ public class GithubImporterInputFilterStream
     private static final String KEY_FORWARD_SLASH = "/";
 
     private static final String KEY_GITHUB_IMPORTER_TEMPDIR = "GithubImporter";
+
+    private static final String KEY_FILE_MD = ".md";
 
     private static final String ERROR_EXCEPTION = "Error: An Exception was thrown.";
 
@@ -147,16 +148,12 @@ public class GithubImporterInputFilterStream
     private void readWikiDirectory(File directory, GithubImporterFilter filterHandler)
         throws FilterException
     {
-        FileFilter fileFilter = file -> (FilenameUtils.getExtension(file.getName()).equals("md")
-            && !file.getName().startsWith("_"));
+        FileFilter fileFilter = file -> (!file.getName().startsWith(".") && !file.getName().startsWith("_"));
         File[] docArray = directory.listFiles(fileFilter);
         if (docArray != null) {
             Arrays.sort(docArray);
             filterHandler.beginWikiSpace(this.properties.getParent().getName(), FilterEventParameters.EMPTY);
-            for (File file : docArray) {
-                readFile(file, getSyntaxParameters(filterHandler),
-                        filterHandler);
-            }
+            readDirectory(docArray, filterHandler);
             filterHandler.endWikiSpace(this.properties.getParent().getName(), FilterEventParameters.EMPTY);
         }
     }
@@ -228,7 +225,7 @@ public class GithubImporterInputFilterStream
                 String pageLink = pageDetailStart.substring(pageDetailStart.indexOf(']') + 2);
                 String pageName = getPageName(pageLink);
                 if (!pageName.equals("")) {
-                    String pageFileName = pageName + ".md";
+                    String pageFileName = pageName + KEY_FILE_MD;
                     File pageFile = new File(directory, pageFileName);
 
                     int pageLevel = line.indexOf('*') < 0 ? line.indexOf('-') : line.indexOf('*');
@@ -280,6 +277,24 @@ public class GithubImporterInputFilterStream
             zipFile.extractAll(destination);
         } catch (Exception e) {
             throw new FilterException(ERROR_EXCEPTION, e);
+        }
+    }
+
+    private void readDirectory(File[] docArray, GithubImporterFilter filterHandler) throws FilterException
+    {
+        if (docArray != null) {
+            Arrays.sort(docArray);
+            for (File file : docArray) {
+                if (file.isDirectory()) {
+                    filterHandler.beginWikiSpace(file.getName(), FilterEventParameters.EMPTY);
+                    readDirectory(file.listFiles(), filterHandler);
+                    filterHandler.endWikiSpace(file.getName(), FilterEventParameters.EMPTY);
+                } else {
+                    if (file.getName().endsWith(KEY_FILE_MD)) {
+                        readFile(file, getSyntaxParameters(filterHandler), filterHandler);
+                    }
+                }
+            }
         }
     }
 }
