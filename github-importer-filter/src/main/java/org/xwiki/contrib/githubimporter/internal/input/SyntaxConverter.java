@@ -21,9 +21,8 @@ package org.xwiki.contrib.githubimporter.internal.input;
 
 import com.xpn.xwiki.CoreConfiguration;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.contrib.githubimporter.internal.GithubImporterSyntaxConverter;
 import org.xwiki.filter.FilterException;
 import org.xwiki.rendering.converter.Converter;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
@@ -32,6 +31,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxType;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.StringReader;
 
 /**
@@ -40,28 +40,27 @@ import java.io.StringReader;
  * @version $Id$
  * @since 1.3
  */
-@Component(roles = GithubImporterSyntaxConverter.class)
-@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class GithubImporterSyntaxConverter
+@Component
+@Singleton
+public class SyntaxConverter implements GithubImporterSyntaxConverter
 {
+    /**
+     * Required to get default document syntax of the user.
+     */
     @Inject
     private CoreConfiguration coreConfiguration;
 
+    /**
+     * Required to get instance of converter for syntax conversion.
+     */
     @Inject
     private ComponentManager componentManager;
 
-    /**
-     * Converts content from Markdown to default syntax.
-     *
-     * @param content the source content to convert
-     * @return converted contents in default syntax
-     * @since 1.3
-     */
+    @Override
     public String getConvertedContent(String content) throws FilterException
     {
         String convertedContent;
         try {
-
             Syntax defaultSyntax = coreConfiguration.getDefaultDocumentSyntax();
             Converter converter = componentManager.getInstance(Converter.class);
             WikiPrinter printer = new DefaultWikiPrinter();
