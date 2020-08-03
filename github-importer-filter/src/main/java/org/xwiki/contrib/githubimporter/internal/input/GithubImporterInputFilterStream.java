@@ -291,6 +291,8 @@ public class GithubImporterInputFilterStream
         } catch (Exception e) {
             throw new FilterException(String.format("Error extracting archive.\nSource: %s\nDestination: %s", source,
                     destination), e);
+        } finally {
+            srcFile.toNonArchiveFile();
         }
 //        try {
 //            ZipFile zipFile = new ZipFile(source);
