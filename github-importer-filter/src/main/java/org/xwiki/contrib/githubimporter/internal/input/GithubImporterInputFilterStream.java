@@ -127,7 +127,7 @@ public class GithubImporterInputFilterStream
                 if (this.properties.isCreateHierarchy()) {
                     readHierarchy(wikiRepoDirectory, filterHandler);
                 } else {
-                    readWikiDirectory(wikiRepoDirectory, filterHandler);
+                    readGitDirectory(wikiRepoDirectory, filterHandler);
                 }
             }
         } else {
@@ -142,7 +142,7 @@ public class GithubImporterInputFilterStream
         this.properties.getSource().close();
     }
 
-    private void readWikiDirectory(File directory, GithubImporterFilter filterHandler)
+    private void readGitDirectory(File directory, GithubImporterFilter filterHandler)
         throws FilterException
     {
         FileFilter fileFilter = file -> (!file.getName().startsWith(".") && !file.getName().startsWith("_"));
@@ -152,7 +152,7 @@ public class GithubImporterInputFilterStream
             String parentName = this.properties.getParent().getName();
             filterHandler.beginWikiSpace(parentName, FilterEventParameters.EMPTY);
             createParentContent(parentName, filterHandler);
-            readDirectory(docArray, filterHandler);
+            readDirectoryRecursive(docArray, filterHandler);
             filterHandler.endWikiSpace(parentName, FilterEventParameters.EMPTY);
         }
     }
@@ -195,7 +195,7 @@ public class GithubImporterInputFilterStream
     {
         File sidebar = new File(directory, "_Sidebar.md");
         if (!sidebar.exists() || !sidebar.canRead()) {
-            readWikiDirectory(directory, filterHandler);
+            readGitDirectory(directory, filterHandler);
         } else {
             readSidebar(sidebar, directory, filterHandler);
         }
@@ -205,12 +205,9 @@ public class GithubImporterInputFilterStream
     {
         ArrayList<String> hierarchy = new ArrayList<>();
         hierarchy.add(this.properties.getParent().getName());
-        try {
-            filterHandler.beginWikiSpace(hierarchy.get(hierarchy.size() - 1),
+        filterHandler.beginWikiSpace(hierarchy.get(hierarchy.size() - 1),
                     FilterEventParameters.EMPTY);
-        } catch (FilterException e) {
-            e.printStackTrace();
-        }
+        createParentContent(this.properties.getParent().getName(), filterHandler);
         final String[] parentName = {""};
         try (Stream<String> linesStream = Files.lines(sidebar.toPath())) {
             final AtomicInteger[] parentLevel = {new AtomicInteger()};
@@ -264,14 +261,14 @@ public class GithubImporterInputFilterStream
         return pageName;
     }
 
-    private void readDirectory(File[] docArray, GithubImporterFilter filterHandler) throws FilterException
+    private void readDirectoryRecursive(File[] docArray, GithubImporterFilter filterHandler) throws FilterException
     {
         if (docArray != null) {
             Arrays.sort(docArray);
             for (File file : docArray) {
                 if (file.isDirectory()) {
                     filterHandler.beginWikiSpace(file.getName(), FilterEventParameters.EMPTY);
-                    readDirectory(file.listFiles(), filterHandler);
+                    readDirectoryRecursive(file.listFiles(), filterHandler);
                     filterHandler.endWikiSpace(file.getName(), FilterEventParameters.EMPTY);
                 } else {
                     if (file.getName().endsWith(KEY_FILE_MD)) {
