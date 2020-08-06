@@ -64,8 +64,7 @@ public class SyntaxConverter implements GithubImporterSyntaxConverter
             Syntax defaultSyntax = coreConfiguration.getDefaultDocumentSyntax();
             Converter converter = componentManager.getInstance(Converter.class);
             WikiPrinter printer = new DefaultWikiPrinter();
-            SyntaxType gfm = new SyntaxType("markdown+github", "GitHub Flavored Markdown");
-            converter.convert(new StringReader(content), new Syntax(gfm, "1.0"), defaultSyntax,
+            converter.convert(new StringReader(content), new Syntax(SyntaxType.MARKDOWN, "1.2"), defaultSyntax,
                     printer);
             convertedContent = printer.toString();
         } catch (Exception e) {
