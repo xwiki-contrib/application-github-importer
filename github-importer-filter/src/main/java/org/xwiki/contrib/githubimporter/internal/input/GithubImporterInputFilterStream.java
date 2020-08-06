@@ -33,7 +33,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import com.xpn.xwiki.CoreConfiguration;
-import de.schlichtherle.truezip.file.TFile;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.lib.Repository;
 import org.xwiki.component.annotation.Component;
@@ -41,6 +40,7 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.contrib.githubimporter.input.GithubImporterInputProperties;
+import org.xwiki.contrib.githubimporter.internal.GithubImporterFileCatcher;
 import org.xwiki.contrib.githubimporter.internal.GithubImporterFilter;
 import org.xwiki.contrib.githubimporter.internal.GithubImporterSyntaxConverter;
 import org.xwiki.environment.Environment;
@@ -65,6 +65,8 @@ public class GithubImporterInputFilterStream
     private static final String KEY_DOT = "\\.";
 
     private static final String KEY_MARKDOWN = "markdown/1.2";
+
+//    private static final String KEY_MARKDOWN_GITHUB = "markdown+github/1.0";
 
 //    private static final String KEY_URL_WIKI = "\\.wiki\\.git";
 
@@ -95,7 +97,10 @@ public class GithubImporterInputFilterStream
     private Environment environment;
 
     @Inject
-    private GithubImporterSyntaxConverter githubImporterSyntaxConverter;
+    private GithubImporterSyntaxConverter syntaxConverter;
+
+    @Inject
+    private GithubImporterFileCatcher fileCatcher;
 
     @Override
     protected void read(Object filter, GithubImporterFilter filterHandler) throws FilterException
@@ -105,9 +110,6 @@ public class GithubImporterInputFilterStream
             File wikiRepoDirectory = null;
             if (inputSource instanceof URLInputSource) {
                 String urlString = ((URLInputSource) inputSource).getURL().toString();
-//                if (!urlString.endsWith(KEY_URL_WIKI) && urlString.endsWith(KEY_URL_GIT)) {
-//                    urlString = readWikiFromRepository(urlString);
-//                }
                 Repository repo = gitManager.getRepository(urlString, getRepoName(urlString),
                     this.properties.getUsername(), this.properties.getAuthCode());
                 wikiRepoDirectory = repo.getWorkTree();
@@ -117,16 +119,18 @@ public class GithubImporterInputFilterStream
                 if (file.isDirectory()) {
                     wikiRepoDirectory = file;
                 } else if (file.getName().endsWith(KEY_ZIP)) {
+//                    try {
+//                        readArchive(file.getAbsolutePath(), filterHandler);
+//                    } catch (Exception e) {
+//                        throw new FilterException(ERROR_EXCEPTION, e);
+//                    }
+                    fileCatcher.extractZip(file.getAbsolutePath(), getTemporaryDirectoryPath());
                     String tempPath = getTemporaryDirectoryPath() + KEY_FORWARD_SLASH
                             + file.getName().split(KEY_ZIP)[0];
-                    readArchive(file.getAbsolutePath(), tempPath);
                     wikiRepoDirectory = new File(tempPath);
                 }
             }
             if (wikiRepoDirectory != null) {
-                if (wikiRepoDirectory.listFiles().length == 0) {
-                    throw new FilterException("The source is empty or does not exist.");
-                }
                 if (this.properties.isCreateHierarchy()) {
                     readHierarchy(wikiRepoDirectory, filterHandler);
                 } else {
@@ -165,7 +169,7 @@ public class GithubImporterInputFilterStream
         try {
             String fileContents = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
             if (this.properties.isConvertSyntax()) {
-                fileContents = githubImporterSyntaxConverter.getConvertedContent(fileContents);
+                fileContents = syntaxConverter.getConvertedContent(fileContents);
             }
             String pageName = file.getName().split(KEY_DOT)[0];
             filterParams.put(WikiDocumentFilter.PARAMETER_CONTENT, fileContents);
@@ -177,11 +181,6 @@ public class GithubImporterInputFilterStream
             throw new FilterException(ERROR_EXCEPTION, e);
         }
     }
-
-//    private String readWikiFromRepository(String urlString)
-//    {
-//        return urlString.split(KEY_URL_GIT)[0] + KEY_URL_WIKI;
-//    }
 
     private String getRepoName(String urlString)
     {
@@ -202,7 +201,6 @@ public class GithubImporterInputFilterStream
         File sidebar = new File(directory, "_Sidebar.md");
         if (!sidebar.exists() || !sidebar.canRead()) {
             readWikiDirectory(directory, filterHandler);
-//            throw new FilterException("Error reading hierarchy: Sidebar is unreadable or does not exist.");
         } else {
             readSidebar(sidebar, directory, filterHandler);
         }
@@ -271,36 +269,51 @@ public class GithubImporterInputFilterStream
         return pageName;
     }
 
-    private void readArchive(String source, String destination) throws FilterException
-    {
-        TFile srcFile = new TFile(source);
-        File dstFile = new File(destination);
-//        TFile wikiRepoDirectory = new TFile(file.getAbsolutePath());
-//        if (wikiRepoDirectory.list().length == 0) {
-//            throw new FilterException("The source is empty or does not exists.");
+//    private void readArchive(String source, GithubImporterFilter filterHandler)
+//            throws FilterException, IOException {
+////        vfsManager.getURL(new VfsResourceReference(URI.create(source)));
+//        DirectoryStream<Path> dirStream = nioTool.newDirectoryStream(Paths.get((source + "/")));
+//        File file = new File("");
+//        for (Path dirPath : dirStream) {
+//            if (nioTool.isDirectory(dirPath)) {
+//                filterHandler.beginWikiSpace(dirPath.getFileName().toString(), FilterEventParameters.EMPTY);
+//                readArchive(dirPath.toAbsolutePath().toString() + "/", filterHandler);
+//                filterHandler.endWikiSpace(dirPath.getFileName().toString(), FilterEventParameters.EMPTY);
+//            } else {
+//                if (dirPath.getFileName().endsWith(KEY_FILE_MD)) {
+//                    FileUtils.writeByteArrayToFile(file, nioTool.readAllBytes(dirPath));
+//                    readFile(file, getSyntaxParameters(filterHandler), filterHandler);
+//                }
+//            }
 //        }
-//        if (this.properties.isCreateHierarchy()) {
-//            readHierarchy(wikiRepoDirectory, filterHandler);
-//        } else {
-//            readWikiDirectory(wikiRepoDirectory, filterHandler);
-//        }
-        try {
-            srcFile.cp(dstFile);
-//            TFile.cp_rp(srcFile, dstFile, TArchiveDetector.NULL, TArchiveDetector.NULL);
-//            dstFile.mkdir(true);
-        } catch (Exception e) {
-            throw new FilterException(String.format("Error extracting archive.\nSource: %s\nDestination: %s", source,
-                    destination), e);
-        } finally {
-            srcFile.toNonArchiveFile();
-        }
-//        try {
-//            ZipFile zipFile = new ZipFile(source);
-//            zipFile.extractAll(destination);
-//        } catch (Exception e) {
-//            throw new FilterException(ERROR_EXCEPTION, e);
-//        }
-    }
+////        TFile srcFile = new TFile(source);
+////        File dstFile = new File(destination);
+////        TFile wikiRepoDirectory = new TFile(file.getAbsolutePath());
+////        if (wikiRepoDirectory.list().length == 0) {
+////            throw new FilterException("The source is empty or does not exists.");
+////        }
+////        if (this.properties.isCreateHierarchy()) {
+////            readHierarchy(wikiRepoDirectory, filterHandler);
+////        } else {
+////            readWikiDirectory(wikiRepoDirectory, filterHandler);
+////        }
+////        try {
+////            srcFile.cp_p(dstFile);
+//////            TFile.cp_rp(srcFile, dstFile, TArchiveDetector.NULL, TArchiveDetector.NULL);
+//////            dstFile.mkdir(true);
+////        } catch (Exception e) {
+////            throw new FilterException(String.format("Error extracting archive.\nSource: %s\nDestination: %s",source,
+////                    destination), e);
+////        } finally {
+////            srcFile.toNonArchiveFile();
+////        }
+////        try {
+////            ZipFile zipFile = new ZipFile(source);
+////            zipFile.extractAll(destination);
+////        } catch (Exception e) {
+////            throw new FilterException(ERROR_EXCEPTION, e);
+////        }
+//    }
 
     private void readDirectory(File[] docArray, GithubImporterFilter filterHandler) throws FilterException
     {
