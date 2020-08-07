@@ -160,11 +160,14 @@
         &lt;input id="githubimporter_properties_descriptor_source_file_input" name="githubimporter_properties_descriptor_source_file" type="text" pattern="^[a-zA-Z]:(\\|\/)[\\\S|*\S]?((.*\.zip)|((([^\.]*))))$"/>&#xd;
       &lt;/dd>&#xd;
       &lt;dt>&#xd;
-        &lt;label for="githubimporter_properties_descriptor_parent">Parent Page&lt;/label>&#xd;
+        &lt;label for="githubimporter_properties_descriptor_parent">&#xd;
+          Parent Page&#xd;
+          &lt;span class="xRequired">(Required)&lt;/span>&#xd;
+        &lt;/label>&#xd;
         &lt;span class="xHint">All of the imported pages will be created under this parent page.&lt;/span>&#xd;
       &lt;/dt>&#xd;
       &lt;dd>&#xd;
-        &lt;input id="githubimporter_properties_descriptor_parent" name="githubimporter_properties_descriptor_parent" type="text" />&#xd;
+        &lt;input id="githubimporter_properties_descriptor_parent" name="githubimporter_properties_descriptor_parent" type="text" required/>&#xd;
       &lt;/dd>&#xd;
       &lt;dt>&#xd;
         &lt;label for="githubimporter_properties_descriptor_parent">Authentication Code&lt;/label>&#xd;

@@ -80,6 +80,8 @@ public class GithubImporterInputFilterStream
 
     private static final String KEY_FILE_MD = ".md";
 
+    private static final String KEY_CREATION_AUTHOR = "GitHub Importer Application";
+
     private static final String ERROR_EXCEPTION = "Error: An Exception was thrown.";
 
     @Inject
@@ -168,6 +170,7 @@ public class GithubImporterInputFilterStream
             }
             String pageName = file.getName().split(KEY_DOT)[0];
             filterParams.put(WikiDocumentFilter.PARAMETER_CONTENT, fileContents);
+            filterParams.put(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR, KEY_CREATION_AUTHOR);
             filterHandler.beginWikiSpace(pageName, filterParams);
             filterHandler.beginWikiDocument(KEY_WEBHOME, filterParams);
             filterHandler.endWikiDocument(KEY_WEBHOME, filterParams);
@@ -186,7 +189,7 @@ public class GithubImporterInputFilterStream
     {
         FilterEventParameters filterParams = new FilterEventParameters();
         if (!this.properties.isConvertSyntax()) {
-            filterParams.put(filterHandler.PARAMETER_SYNTAX, KEY_MARKDOWN);
+            filterParams.put(WikiDocumentFilter.PARAMETER_SYNTAX, KEY_MARKDOWN);
         }
         return filterParams;
     }
@@ -295,8 +298,9 @@ public class GithubImporterInputFilterStream
         String parentContent = String.format("{{documents location=\"%s.\" columns=\"doc.title,"
                 + "doc.location,doc.date\"}}", parentName);
         FilterEventParameters filterParams = new FilterEventParameters();
-        filterParams.put(filterHandler.PARAMETER_SYNTAX, KEY_XWIKI_SYNTAX);
+        filterParams.put(WikiDocumentFilter.PARAMETER_SYNTAX, KEY_XWIKI_SYNTAX);
         filterParams.put(WikiDocumentFilter.PARAMETER_CONTENT, parentContent);
+        filterParams.put(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR, KEY_CREATION_AUTHOR);
         filterHandler.beginWikiDocument(KEY_WEBHOME, filterParams);
         filterHandler.endWikiDocument(KEY_WEBHOME, filterParams);
     }
