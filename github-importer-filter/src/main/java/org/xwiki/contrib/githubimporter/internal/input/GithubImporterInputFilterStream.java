@@ -52,6 +52,10 @@ import org.xwiki.filter.input.FileInputSource;
 import org.xwiki.filter.input.InputSource;
 import org.xwiki.filter.input.URLInputSource;
 import org.xwiki.git.GitManager;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.GuestUserReference;
 
 /**
  * @version $Id$
@@ -101,6 +105,9 @@ public class GithubImporterInputFilterStream
 
     @Inject
     private GithubImporterFileCatcher fileCatcher;
+
+    @Inject
+    private UserReferenceResolver<CurrentUserReference> userResolver;
 
     @Override
     protected void read(Object filter, GithubImporterFilter filterHandler) throws FilterException
@@ -169,8 +176,8 @@ public class GithubImporterInputFilterStream
                 fileContents = syntaxConverter.getConvertedContent(fileContents);
             }
             String pageName = file.getName().split(KEY_DOT)[0];
+            assignAuthor(filterParams);
             filterParams.put(WikiDocumentFilter.PARAMETER_CONTENT, fileContents);
-            filterParams.put(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR, KEY_CREATION_AUTHOR);
             filterHandler.beginWikiSpace(pageName, filterParams);
             filterHandler.beginWikiDocument(KEY_WEBHOME, filterParams);
             filterHandler.endWikiDocument(KEY_WEBHOME, filterParams);
@@ -298,10 +305,18 @@ public class GithubImporterInputFilterStream
         String parentContent = String.format("{{documents location=\"%s.\" columns=\"doc.title,"
                 + "doc.location,doc.date\"}}", parentName);
         FilterEventParameters filterParams = new FilterEventParameters();
+        assignAuthor(filterParams);
         filterParams.put(WikiDocumentFilter.PARAMETER_SYNTAX, KEY_XWIKI_SYNTAX);
         filterParams.put(WikiDocumentFilter.PARAMETER_CONTENT, parentContent);
-        filterParams.put(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR, KEY_CREATION_AUTHOR);
         filterHandler.beginWikiDocument(KEY_WEBHOME, filterParams);
         filterHandler.endWikiDocument(KEY_WEBHOME, filterParams);
+    }
+
+    private void assignAuthor(FilterEventParameters filterParams)
+    {
+        UserReference userReference = this.userResolver.resolve(CurrentUserReference.INSTANCE);
+        if (GuestUserReference.INSTANCE == userReference) {
+            filterParams.put(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR, KEY_CREATION_AUTHOR);
+        }
     }
 }

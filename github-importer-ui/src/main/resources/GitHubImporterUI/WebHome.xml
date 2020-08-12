@@ -64,18 +64,6 @@
 &#xd;
   ## Set default options for XWiki output instance otherwise outputProperties will be null&#xd;
   #set($outputProperties = {})&#xd;
-  #set($void = $outputProperties.put('verbose', 'true'))&#xd;
-  #set($void = $outputProperties.put('author', ''))&#xd;
-  #set($void = $outputProperties.put('groupPrefix', ''))&#xd;
-  #set($void = $outputProperties.put('groupSuffix', ''))&#xd;
-  #set($void = $outputProperties.put('saveComment', 'Import'))&#xd;
-  #set($void = $outputProperties.put('versionPreserved', 'true'))&#xd;
-  #set($void = $outputProperties.put('authorPreserved', 'true'))&#xd;
-  #set($void = $outputProperties.put('defaultReference', ''))&#xd;
-  #set($void = $outputProperties.put('defaultSyntax', ''))&#xd;
-  #set($void = $outputProperties.put('previousDeleted', 'true'))&#xd;
-  #set($void = $outputProperties.put('stoppedWhenSaveFail', 'true'))&#xd;
-  &#xd;
   ## Set job in filter and start the conversion&#xd;
   #set($job = $services.filter.startConvert($input, $inputProperties, $output, $outputProperties))&#xd;
   #if ($job and $request.method == 'POST')&#xd;
