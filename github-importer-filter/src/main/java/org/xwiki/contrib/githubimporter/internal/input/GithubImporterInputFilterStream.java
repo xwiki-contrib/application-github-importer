@@ -68,7 +68,7 @@ public class GithubImporterInputFilterStream
 {
     private static final String KEY_DOT = "\\.";
 
-    private static final String KEY_MARKDOWN = "markdown/1.2";
+    private static final String KEY_MARKDOWN_GITHUB = "markdown+github/1.0";
 
     private static final String KEY_XWIKI_SYNTAX = "xwiki/2.1";
 
@@ -196,7 +196,7 @@ public class GithubImporterInputFilterStream
     {
         FilterEventParameters filterParams = new FilterEventParameters();
         if (!this.properties.isConvertSyntax()) {
-            filterParams.put(WikiDocumentFilter.PARAMETER_SYNTAX, KEY_MARKDOWN);
+            filterParams.put(WikiDocumentFilter.PARAMETER_SYNTAX, KEY_MARKDOWN_GITHUB);
         }
         return filterParams;
     }

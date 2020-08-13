@@ -75,8 +75,8 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.contrib.markdown</groupId>
-      <artifactId>syntax-markdown-markdown12</artifactId>
-      <version>8.6</version>
+      <artifactId>syntax-markdown-flavor-github</artifactId>
+      <version>8.7</version>
       <exclusions>
         <exclusion>
           <groupId>org.xwiki.commons</groupId>
