@@ -35,7 +35,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <content>githubimporter.sourcetype.title=Source Type&#xd;
 githubimporter.sourcetype.hint=This can be URL or File.&#xd;
 githubimporter.sourcetype.url=URL&#xd;
