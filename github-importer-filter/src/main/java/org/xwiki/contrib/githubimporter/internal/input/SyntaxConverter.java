@@ -23,8 +23,10 @@ import com.xpn.xwiki.CoreConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.contrib.githubimporter.internal.GithubImporterSyntaxConverter;
+import org.xwiki.contrib.mediawiki.syntax.internal.parser.MediaWikiParser;
 import org.xwiki.filter.FilterException;
 import org.xwiki.rendering.converter.Converter;
+import org.xwiki.rendering.internal.parser.creole.CreoleParser;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
@@ -57,15 +59,29 @@ public class SyntaxConverter implements GithubImporterSyntaxConverter
     private ComponentManager componentManager;
 
     @Override
-    public String getConvertedContent(String content) throws FilterException
+    public String getConvertedContent(String content, String syntaxId) throws FilterException
     {
         String convertedContent;
         try {
             Syntax defaultSyntax = coreConfiguration.getDefaultDocumentSyntax();
             Converter converter = componentManager.getInstance(Converter.class);
             WikiPrinter printer = new DefaultWikiPrinter();
-            SyntaxType gfm = new SyntaxType("markdown+github", "GitHub Flavored Markdown");
-            converter.convert(new StringReader(content), new Syntax(gfm, "1.0"), defaultSyntax,
+            Syntax syntaxToConvert;
+            switch (syntaxId) {
+                case "markdown+github/1.0":
+                    SyntaxType gfm = new SyntaxType("markdown+github", "GitHub Flavored Markdown");
+                    syntaxToConvert = new Syntax(gfm, "1.0");
+                    break;
+                case "mediawiki/1.6":
+                    syntaxToConvert = new MediaWikiParser().getSyntax();
+                    break;
+                case "creole/1.0":
+                    syntaxToConvert = new CreoleParser().getSyntax();
+                    break;
+                default:
+                    return content;
+            }
+            converter.convert(new StringReader(content), syntaxToConvert, defaultSyntax,
                     printer);
             convertedContent = printer.toString();
         } catch (Exception e) {

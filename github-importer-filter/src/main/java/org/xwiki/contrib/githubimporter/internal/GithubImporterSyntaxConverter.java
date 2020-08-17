@@ -35,8 +35,9 @@ public interface GithubImporterSyntaxConverter
      * Converts content from Markdown to default syntax.
      *
      * @param content the source content to convert
+     * @param syntaxId the id of the syntax to convert from
      * @return converted contents in default syntax
      * @since 1.3
      */
-    String getConvertedContent(String content) throws FilterException;
+    String getConvertedContent(String content, String syntaxId) throws FilterException;
 }

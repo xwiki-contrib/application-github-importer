@@ -70,6 +70,10 @@ public class GithubImporterInputFilterStream
 
     private static final String KEY_MARKDOWN_GITHUB = "markdown+github/1.0";
 
+    private static final String KEY_MEDIAWIKI_SYNTAX = "mediawiki/1.6";
+
+    private static final String KEY_CREOLE_SYNTAX = "creole/1.0";
+
     private static final String KEY_XWIKI_SYNTAX = "xwiki/2.1";
 
     private static final String KEY_URL_GIT = "\\.git";
@@ -83,6 +87,10 @@ public class GithubImporterInputFilterStream
     private static final String KEY_GITHUB_IMPORTER_TEMPDIR = "GithubImporter";
 
     private static final String KEY_FILE_MD = ".md";
+
+    private static final String KEY_FILE_MEDIAWIKI = ".mediawiki";
+
+    private static final String KEY_FILE_CREOLE = ".creole";
 
     private static final String KEY_CREATION_AUTHOR = "GitHub Importer Application";
 
@@ -166,14 +174,13 @@ public class GithubImporterInputFilterStream
         }
     }
 
-    private void readFile(File file, FilterEventParameters filterParams,
-                          GithubImporterFilter filterHandler)
-        throws FilterException
+    private void readFile(File file, FilterEventParameters filterParams, String syntaxId,
+                          GithubImporterFilter filterHandler) throws FilterException
     {
         try {
             String fileContents = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
             if (this.properties.isConvertSyntax()) {
-                fileContents = syntaxConverter.getConvertedContent(fileContents);
+                fileContents = syntaxConverter.getConvertedContent(fileContents, syntaxId);
             }
             String pageName = file.getName().split(KEY_DOT)[0];
             assignAuthor(filterParams);
@@ -192,11 +199,11 @@ public class GithubImporterInputFilterStream
         return urlString.substring(urlString.lastIndexOf(KEY_FORWARD_SLASH) + 1).split(KEY_URL_GIT)[0];
     }
 
-    private FilterEventParameters getSyntaxParameters(GithubImporterFilter filterHandler)
+    private FilterEventParameters getSyntaxParameters(GithubImporterFilter filterHandler, String syntaxKey)
     {
         FilterEventParameters filterParams = new FilterEventParameters();
         if (!this.properties.isConvertSyntax()) {
-            filterParams.put(WikiDocumentFilter.PARAMETER_SYNTAX, KEY_MARKDOWN_GITHUB);
+            filterParams.put(WikiDocumentFilter.PARAMETER_SYNTAX, syntaxKey);
         }
         return filterParams;
     }
@@ -242,8 +249,7 @@ public class GithubImporterInputFilterStream
                                     FilterEventParameters.EMPTY);
                             hierarchy.remove(hierarchy.size() - 1);
                         }
-                        readFile(pageFile, getSyntaxParameters(filterHandler),
-                                filterHandler);
+                        readFileType(pageFile, filterHandler);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -281,9 +287,7 @@ public class GithubImporterInputFilterStream
                     readDirectoryRecursive(file.listFiles(), filterHandler);
                     filterHandler.endWikiSpace(file.getName(), FilterEventParameters.EMPTY);
                 } else {
-                    if (file.getName().endsWith(KEY_FILE_MD)) {
-                        readFile(file, getSyntaxParameters(filterHandler), filterHandler);
-                    }
+                    readFileType(file, filterHandler);
                 }
             }
         }
@@ -317,6 +321,20 @@ public class GithubImporterInputFilterStream
         UserReference userReference = this.userResolver.resolve(CurrentUserReference.INSTANCE);
         if (GuestUserReference.INSTANCE == userReference) {
             filterParams.put(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR, KEY_CREATION_AUTHOR);
+        }
+    }
+
+    private void readFileType(File file, GithubImporterFilter filterHandler) throws FilterException
+    {
+        if (file.getName().endsWith(KEY_FILE_MD)) {
+            readFile(file, getSyntaxParameters(filterHandler, KEY_MARKDOWN_GITHUB), KEY_MARKDOWN_GITHUB, filterHandler);
+        }
+        if (file.getName().endsWith(KEY_FILE_MEDIAWIKI)) {
+            readFile(file, getSyntaxParameters(filterHandler, KEY_MEDIAWIKI_SYNTAX), KEY_MEDIAWIKI_SYNTAX,
+                    filterHandler);
+        }
+        if (file.getName().endsWith(KEY_FILE_CREOLE)) {
+            readFile(file, getSyntaxParameters(filterHandler, KEY_CREOLE_SYNTAX), KEY_CREOLE_SYNTAX, filterHandler);
         }
     }
 }
