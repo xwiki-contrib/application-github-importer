@@ -41,7 +41,8 @@
   ## Set input and output types for filter&#xd;
   #set($input = 'githubimporter+wiki')&#xd;
   #set($output = 'xwiki+instance')&#xd;
-  &#xd;
+  ## Should validate if parent already exists&#xd;
+  #set($parentValidationError = false)&#xd;
   ## Set input properties by going through each request parameter value&#xd;
   #set($inputProperties = {})&#xd;
   #foreach($parameterName in $request.parameterNames)&#xd;
@@ -56,18 +57,29 @@
           #set($paramValue = "file:${paramValue}")&#xd;
         #end&#xd;
       #end&#xd;
+      #if ($propertyName.startsWith('parent'))&#xd;
+        #set($hql="select count(doc) from XWikiDocument doc where doc.space = ?")&#xd;
+        #set($docsInSpace = $xwiki.search($hql, 1, 0, [$paramValue]))&#xd;
+        #if ($docsInSpace.get(0) > 0)&#xd;
+          #set ($parentValidationError = "$services.localization.render('githubimporter.validation.parent')")&#xd;
+        #end&#xd;
+      #end&#xd;
       #if ($request.getParameter($parameterName) &amp;&amp; $request.getParameter($parameterName) != '')&#xd;
         #set($void = $inputProperties.put($propertyName, $paramValue))&#xd;
       #end&#xd;
     #end&#xd;
   #end&#xd;
 &#xd;
-  ## Set default options for XWiki output instance otherwise outputProperties will be null&#xd;
-  #set($outputProperties = {})&#xd;
-  ## Set job in filter and start the conversion&#xd;
-  #set($job = $services.filter.startConvert($input, $inputProperties, $output, $outputProperties))&#xd;
-  #if ($job and $request.method == 'POST')&#xd;
-    {{info}}A job for the import has started. Please wait until it is done.{{/info}}&#xd;
+  #if ($parentValidationError)&#xd;
+    {{error}}$parentValidationError{{/error}}&#xd;
+  #else&#xd;
+    ## Set default options for XWiki output instance otherwise outputProperties will be null&#xd;
+    #set($outputProperties = {})&#xd;
+    ## Set job in filter and start the conversion&#xd;
+    #set($job = $services.filter.startConvert($input, $inputProperties, $output, $outputProperties))&#xd;
+    #if ($job and $request.method == 'POST')&#xd;
+      {{info}}$services.localization.render('githubimporter.job.info'){{/info}}&#xd;
+    #end&#xd;
   #end&#xd;
 #end&#xd;
 {{/velocity}}&#xd;
@@ -80,7 +92,7 @@
 &#xd;
 {{velocity}}&#xd;
 ## Display job log of conversion&#xd;
-#if ($request.method == 'POST')&#xd;
+#if (!$parentValidationError &amp;&amp; $request.method == 'POST')&#xd;
 == Import Information ==&#xd;
 {{html}}&#xd;
   &lt;div id="filter_job_status">&#xd;
@@ -97,11 +109,11 @@
         #else&#xd;
           #if (!$jobStatus.logTail.hasLogLevel('ERROR'))&#xd;
             &lt;div class="box successmessage">&#xd;
-              Import completed.&#xd;
+              $services.localization.render('githubimporter.job.complete')&#xd;
             &lt;/div>&#xd;
           #else&#xd;
             &lt;div class="box errormessage">&#xd;
-              An error has occured during the import. Check the Job log for more information.&#xd;
+              $services.localization.render('githubimporter.job.error')&#xd;
             &lt;/div>&#xd;
           #end&#xd;
         #end&#xd;
@@ -284,24 +296,24 @@
     </property>
     <property>
       <code>require(['jquery'], function ($) {&#xd;
-        $('#githubimporter_sourcetype').change(function () {&#xd;
-        if ($(this).val() === 'file') {&#xd;
-        $('.githubimporter_properties_descriptor_source_file').removeClass('hidden');&#xd;
-        $('.githubimporter_properties_descriptor_source').addClass('hidden');&#xd;
-        $('#githubimporter_properties_descriptor_source_input').attr('name', '');&#xd;
-        $('#githubimporter_properties_descriptor_source_file_input').attr('name', 'githubimporter_properties_descriptor_source_file');&#xd;
-        $('#githubimporter_properties_descriptor_source_input').removeAttr('required');&#xd;
-        $('#githubimporter_properties_descriptor_source_file_input').prop('required',true);&#xd;
-        } else {&#xd;
-        $('.githubimporter_properties_descriptor_source').removeClass('hidden');&#xd;
-        $('.githubimporter_properties_descriptor_source_file').addClass('hidden');&#xd;
-        $('#githubimporter_properties_descriptor_source_file_input').attr('name', '');&#xd;
-        $('#githubimporter_properties_descriptor_source_input').attr('name', 'githubimporter_properties_descriptor_source');&#xd;
-        $('#githubimporter_properties_descriptor_source_input').prop('required',true);&#xd;
-        $('#githubimporter_properties_descriptor_source_file_input').removeAttr('required');&#xd;
-        }&#xd;
-        });&#xd;
-        });</code>
+  $('#githubimporter_sourcetype').change(function () {&#xd;
+    if ($(this).val() === 'file') {&#xd;
+      $('.githubimporter_properties_descriptor_source_file').removeClass('hidden');&#xd;
+      $('.githubimporter_properties_descriptor_source').addClass('hidden');&#xd;
+      $('#githubimporter_properties_descriptor_source_input').attr('name', '');&#xd;
+      $('#githubimporter_properties_descriptor_source_file_input').attr('name', 'githubimporter_properties_descriptor_source_file');&#xd;
+      $('#githubimporter_properties_descriptor_source_input').removeAttr('required');&#xd;
+      $('#githubimporter_properties_descriptor_source_file_input').prop('required',true);&#xd;
+    } else {&#xd;
+      $('.githubimporter_properties_descriptor_source').removeClass('hidden');&#xd;
+      $('.githubimporter_properties_descriptor_source_file').addClass('hidden');&#xd;
+      $('#githubimporter_properties_descriptor_source_file_input').attr('name', '');&#xd;
+      $('#githubimporter_properties_descriptor_source_input').attr('name', 'githubimporter_properties_descriptor_source');&#xd;
+      $('#githubimporter_properties_descriptor_source_input').prop('required',true);&#xd;
+      $('#githubimporter_properties_descriptor_source_file_input').removeAttr('required');&#xd;
+    }&#xd;
+  });&#xd;
+});</code>
     </property>
     <property>
       <name>SourceTypeJS</name>
