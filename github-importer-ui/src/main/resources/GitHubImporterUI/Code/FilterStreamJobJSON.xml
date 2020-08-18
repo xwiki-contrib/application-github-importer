@@ -44,11 +44,11 @@
   #if ($finished)
     #if (!$jobStatus.logTail.hasLogLevel('ERROR'))
       &lt;div class="box successmessage"&gt;
-        Done.
+        $services.localization.render('githubimporter.job.complete')
       &lt;/div&gt;
     #else
       &lt;div class="box errormessage"&gt;
-        Error has been found during the conversion !
+        $services.localization.render('githubimporter.job.error')
       &lt;/div&gt;
     #end
   #end

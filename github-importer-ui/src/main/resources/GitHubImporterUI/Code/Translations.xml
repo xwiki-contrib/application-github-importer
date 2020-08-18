@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>githubimporter.sourcetype.title=Source Type&#xd;
-githubimporter.sourcetype.hint=This can be URL or File.&#xd;
+githubimporter.sourcetype.hint=This can be URL or File. (Note: Internet access is required for URL source)&#xd;
 githubimporter.sourcetype.url=URL&#xd;
 githubimporter.sourcetype.file=FILE / DIRECTORY&#xd;
 githubimporter.source.url.title=URL&#xd;
@@ -55,9 +55,9 @@ githubimporter.convertsyntax.hint=The syntax of the pages will be converted to t
 githubimporter.createhierarchy.title=Create hierarchy of pages&#xd;
 githubimporter.createhierarchy.hint=Create the pages hierarchically according to their level defined in Sidebar (if exists).&#xd;
 githubimporter.validation.parent=Parent page already exists. Please specify a new parent.&#xd;
-githubimporter.job.info=A job for the import has started. Please wait until it is done.&#xd;
+githubimporter.job.info=A job for the import has started. Please wait until it has completed.&#xd;
 githubimporter.job.complete=Import completed.&#xd;
-githubimporter.job.error=An error has occured during the import. Check the Job log for more information.&#xd;
+githubimporter.job.error=An error has occurred during the import. Check the Job log for more information.&#xd;
 githubimporter.validation.required=(Required)&#xd;
 githubimporter.button.import=Import</content>
   <object>
