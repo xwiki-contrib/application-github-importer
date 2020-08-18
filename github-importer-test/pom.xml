@@ -31,7 +31,7 @@
 
     <groupId>org.xwiki.contrib.github-importer</groupId>
     <artifactId>github-importer-test</artifactId>
-    <version>1.4-SNAPSHOT</version>
+    <version>1.4</version>
     <name>GitHub Importer - Tests - Parent POM</name>
     <packaging>pom</packaging>
     <description>GitHub Importer - Tests - Parent POM</description>
@@ -56,4 +56,8 @@
             </modules>
         </profile>
     </profiles>
+
+  <scm>
+    <tag>github-importer-1.4</tag>
+  </scm>
 </project>
