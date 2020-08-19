@@ -35,6 +35,7 @@ import javax.inject.Named;
 import com.xpn.xwiki.CoreConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.lib.Repository;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -117,6 +118,9 @@ public class GithubImporterInputFilterStream
     @Inject
     private UserReferenceResolver<CurrentUserReference> userResolver;
 
+    @Inject
+    private Logger logger;
+
     @Override
     protected void read(Object filter, GithubImporterFilter filterHandler) throws FilterException
     {
@@ -124,6 +128,7 @@ public class GithubImporterInputFilterStream
         if (inputSource != null) {
             File wikiRepoDirectory = null;
             if (inputSource instanceof URLInputSource) {
+                logger.warn("URL source!");
                 String urlString = ((URLInputSource) inputSource).getURL().toString();
                 Repository repo = gitManager.getRepository(urlString, getRepoName(urlString),
                     this.properties.getUsername(), this.properties.getAuthCode());
@@ -199,7 +204,7 @@ public class GithubImporterInputFilterStream
         return urlString.substring(urlString.lastIndexOf(KEY_FORWARD_SLASH) + 1).split(KEY_URL_GIT)[0];
     }
 
-    private FilterEventParameters getSyntaxParameters(GithubImporterFilter filterHandler, String syntaxKey)
+    private FilterEventParameters getSyntaxParameters(String syntaxKey)
     {
         FilterEventParameters filterParams = new FilterEventParameters();
         if (!this.properties.isConvertSyntax()) {
@@ -284,6 +289,7 @@ public class GithubImporterInputFilterStream
             for (File file : docArray) {
                 if (file.isDirectory()) {
                     filterHandler.beginWikiSpace(file.getName(), FilterEventParameters.EMPTY);
+                    createParentContent(file.getName(), filterHandler);
                     readDirectoryRecursive(file.listFiles(), filterHandler);
                     filterHandler.endWikiSpace(file.getName(), FilterEventParameters.EMPTY);
                 } else {
@@ -327,14 +333,14 @@ public class GithubImporterInputFilterStream
     private void readFileType(File file, GithubImporterFilter filterHandler) throws FilterException
     {
         if (file.getName().endsWith(KEY_FILE_MD)) {
-            readFile(file, getSyntaxParameters(filterHandler, KEY_MARKDOWN_GITHUB), KEY_MARKDOWN_GITHUB, filterHandler);
+            readFile(file, getSyntaxParameters(KEY_MARKDOWN_GITHUB), KEY_MARKDOWN_GITHUB, filterHandler);
         }
         if (file.getName().endsWith(KEY_FILE_MEDIAWIKI)) {
-            readFile(file, getSyntaxParameters(filterHandler, KEY_MEDIAWIKI_SYNTAX), KEY_MEDIAWIKI_SYNTAX,
+            readFile(file, getSyntaxParameters(KEY_MEDIAWIKI_SYNTAX), KEY_MEDIAWIKI_SYNTAX,
                     filterHandler);
         }
         if (file.getName().endsWith(KEY_FILE_CREOLE)) {
-            readFile(file, getSyntaxParameters(filterHandler, KEY_CREOLE_SYNTAX), KEY_CREOLE_SYNTAX, filterHandler);
+            readFile(file, getSyntaxParameters(KEY_CREOLE_SYNTAX), KEY_CREOLE_SYNTAX, filterHandler);
         }
     }
 }
