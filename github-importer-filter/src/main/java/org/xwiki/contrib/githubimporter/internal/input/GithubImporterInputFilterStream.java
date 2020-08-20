@@ -53,10 +53,6 @@ import org.xwiki.filter.input.FileInputSource;
 import org.xwiki.filter.input.InputSource;
 import org.xwiki.filter.input.URLInputSource;
 import org.xwiki.git.GitManager;
-import org.xwiki.user.CurrentUserReference;
-import org.xwiki.user.UserReference;
-import org.xwiki.user.UserReferenceResolver;
-import org.xwiki.user.GuestUserReference;
 
 /**
  * @version $Id$
@@ -116,9 +112,6 @@ public class GithubImporterInputFilterStream
     private GithubImporterFileCatcher fileCatcher;
 
     @Inject
-    private UserReferenceResolver<CurrentUserReference> userResolver;
-
-    @Inject
     private Logger logger;
 
     @Override
@@ -164,18 +157,25 @@ public class GithubImporterInputFilterStream
         this.properties.getSource().close();
     }
 
-    private void readGitDirectory(File directory, GithubImporterFilter filterHandler)
-        throws FilterException
+    private void readGitDirectory(File directory, GithubImporterFilter filterHandler) throws FilterException
     {
         FileFilter fileFilter = file -> (!file.getName().startsWith(".") && !file.getName().startsWith("_"));
         File[] docArray = directory.listFiles(fileFilter);
         if (docArray != null) {
             Arrays.sort(docArray);
-            String parentName = this.properties.getParent().getName();
-            filterHandler.beginWikiSpace(parentName, FilterEventParameters.EMPTY);
-            createParentContent(parentName, filterHandler);
-            readDirectoryRecursive(docArray, filterHandler);
-            filterHandler.endWikiSpace(parentName, FilterEventParameters.EMPTY);
+            String parentName = this.properties.getParent().toString().replaceAll("Space ", "");
+            String[] spaces = parentName.split(KEY_DOT);
+            for (int i = 0; i < spaces.length; i++) {
+                filterHandler.beginWikiSpace(spaces[i], FilterEventParameters.EMPTY);
+                if (i == spaces.length - 1) {
+                    createParentContent(spaces[i], filterHandler);
+                    readDirectoryRecursive(docArray, filterHandler);
+                    for (int j = spaces.length - 1; j >= 0; j--) {
+                        filterHandler.endWikiSpace(spaces[j], FilterEventParameters.EMPTY);
+                    }
+                }
+            }
+//            parentName = new EntityReference("WebHome", EntityType.SPACE, this.properties.getParent()).;
         }
     }
 
@@ -324,10 +324,10 @@ public class GithubImporterInputFilterStream
 
     private void assignAuthor(FilterEventParameters filterParams)
     {
-        UserReference userReference = this.userResolver.resolve(CurrentUserReference.INSTANCE);
-        if (GuestUserReference.INSTANCE == userReference) {
-            filterParams.put(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR, KEY_CREATION_AUTHOR);
-        }
+//        UserReference userReference = this.userResolver.resolve(CurrentUserReference.INSTANCE);
+//        if (GuestUserReference.INSTANCE == userReference) {
+//            filterParams.put(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR, KEY_CREATION_AUTHOR);
+//        }
     }
 
     private void readFileType(File file, GithubImporterFilter filterHandler) throws FilterException
