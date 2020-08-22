@@ -1495,6 +1495,6 @@ A Repository for GitHub testing.&#xd;
 </wikiSpace>
 .#------------------------------------------------------------------------------
 .input|githubimporter+wiki
-.configuration.source=TestRepoHaxsen.zip
+.configuration.source=file:TestRepoHaxsen.zip
 .configuration.parent=GitImp
 .#------------------------------------------------------------------------------
