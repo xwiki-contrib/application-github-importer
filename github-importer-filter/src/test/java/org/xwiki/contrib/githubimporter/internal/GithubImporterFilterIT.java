@@ -19,10 +19,20 @@
  */
 package org.xwiki.contrib.githubimporter.internal;
 
+import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.runner.RunWith;
+import org.xwiki.contrib.githubimporter.internal.input.GithubImporterInputFilterStream;
+import org.xwiki.environment.Environment;
 import org.xwiki.filter.test.integration.FilterTestSuite;
 import org.xwiki.filter.test.integration.FilterTestSuite.Scope;
 import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
+
+import java.io.File;
+
+import static org.mockito.Mockito.when;
 
 /**
  * Run all tests found in the classpath. These {@code *.test} files must follow the conventions described in {@link
@@ -33,6 +43,22 @@ import org.xwiki.test.annotation.AllComponents;
 @RunWith(FilterTestSuite.class)
 @AllComponents
 @Scope(value = "githubimporter")
-public class GithubImporterFilterIT
+public class GithubImporterFilterIT extends TestCase
 {
+    @Rule
+    public MockitoComponentMockingRule<GithubImporterInputFilterStream> mocker =
+            new MockitoComponentMockingRule<>(GithubImporterInputFilterStream.class);
+
+    @Before
+    public void setUp() throws Exception
+    {
+        super.setUp();
+        Environment environment = this.mocker.registerMockComponent(Environment.class);
+        when(environment.getPermanentDirectory()).thenReturn(getTemporaryDirectory());
+    }
+
+    private static File getTemporaryDirectory()
+    {
+        return new File("target/tempdir");
+    }
 }

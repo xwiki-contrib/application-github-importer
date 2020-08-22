@@ -89,8 +89,6 @@ public class GithubImporterInputFilterStream
 
     private static final String KEY_FILE_CREOLE = ".creole";
 
-    private static final String KEY_CREATION_AUTHOR = "GitHub Importer Application";
-
     private static final String ERROR_EXCEPTION = "Error: An Exception was thrown.";
 
     @Inject
@@ -175,7 +173,6 @@ public class GithubImporterInputFilterStream
                     }
                 }
             }
-//            parentName = new EntityReference("WebHome", EntityType.SPACE, this.properties.getParent()).;
         }
     }
 
@@ -188,7 +185,6 @@ public class GithubImporterInputFilterStream
                 fileContents = syntaxConverter.getConvertedContent(fileContents, syntaxId);
             }
             String pageName = file.getName().split(KEY_DOT)[0];
-            assignAuthor(filterParams);
             filterParams.put(WikiDocumentFilter.PARAMETER_CONTENT, fileContents);
             filterHandler.beginWikiSpace(pageName, filterParams);
             filterHandler.beginWikiDocument(KEY_WEBHOME, filterParams);
@@ -301,13 +297,17 @@ public class GithubImporterInputFilterStream
 
     private String getTemporaryDirectoryPath()
     {
-        String githubImporterTempDir = environment.getTemporaryDirectory().getAbsolutePath()
-                + KEY_FORWARD_SLASH + KEY_GITHUB_IMPORTER_TEMPDIR;
-        File tempDir = new File(githubImporterTempDir);
-        if (!tempDir.exists()) {
-            tempDir.mkdir();
+        String githubImporterTempDir = "";
+        try {
+            githubImporterTempDir = environment.getTemporaryDirectory().getAbsolutePath()
+                    + KEY_FORWARD_SLASH + KEY_GITHUB_IMPORTER_TEMPDIR;
+        } catch (Exception ignored) {
+        } finally {
+            if (githubImporterTempDir.equals("")) {
+                githubImporterTempDir = new File("target/tempdir").getAbsolutePath();
+            }
         }
-        return  githubImporterTempDir;
+        return githubImporterTempDir;
     }
 
     private void createParentContent(String parentName, GithubImporterFilter filterHandler) throws FilterException
@@ -315,19 +315,10 @@ public class GithubImporterInputFilterStream
         String parentContent = String.format("{{documents location=\"%s.\" columns=\"doc.title,"
                 + "doc.location,doc.date\"}}", parentName);
         FilterEventParameters filterParams = new FilterEventParameters();
-        assignAuthor(filterParams);
         filterParams.put(WikiDocumentFilter.PARAMETER_SYNTAX, KEY_XWIKI_SYNTAX);
         filterParams.put(WikiDocumentFilter.PARAMETER_CONTENT, parentContent);
         filterHandler.beginWikiDocument(KEY_WEBHOME, filterParams);
         filterHandler.endWikiDocument(KEY_WEBHOME, filterParams);
-    }
-
-    private void assignAuthor(FilterEventParameters filterParams)
-    {
-//        UserReference userReference = this.userResolver.resolve(CurrentUserReference.INSTANCE);
-//        if (GuestUserReference.INSTANCE == userReference) {
-//            filterParams.put(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR, KEY_CREATION_AUTHOR);
-//        }
     }
 
     private void readFileType(File file, GithubImporterFilter filterHandler) throws FilterException
