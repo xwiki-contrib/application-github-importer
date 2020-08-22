@@ -1,0 +1,7 @@
+''italic''
+'''bold''' 
+'''''bold & italic'''''
+[http://www.example.com]
+[http://www.example.com display text]
+http://www.example.com
+[mailto:bob@yahoo.com Bob's email] 
