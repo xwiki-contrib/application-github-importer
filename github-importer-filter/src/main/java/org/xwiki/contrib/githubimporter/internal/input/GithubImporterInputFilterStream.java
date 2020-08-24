@@ -26,6 +26,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
@@ -73,7 +75,7 @@ public class GithubImporterInputFilterStream
 
     private static final String KEY_XWIKI_SYNTAX = "xwiki/2.1";
 
-    private static final String KEY_URL_GIT = "\\.git";
+    private static final String KEY_URL_GIT = ".git";
 
     private static final String KEY_WEBHOME = "WebHome";
 
@@ -88,6 +90,19 @@ public class GithubImporterInputFilterStream
     private static final String KEY_FILE_MEDIAWIKI = ".mediawiki";
 
     private static final String KEY_FILE_CREOLE = ".creole";
+
+    private static final String KEY_GIT_URL_BLOB = "/blob/";
+
+    private static final String KEY_GIT_URL_TREE = "/tree/";
+
+    private static final String KEY_BULLET_DASH = "-";
+
+    private static final String KEY_BULLET_STERIC = "*";
+
+    private static final String KEY_REGEX_TREE = "/blob/|/tree/";
+
+    private static final String ERROR_SIDEBAR = "Sidebar is unreadable or unsupported. Please uncheck Create Hierarchy"
+            + " or fix the Sidebar. ";
 
     private static final String ERROR_EXCEPTION = "Error: An Exception was thrown.";
 
@@ -161,8 +176,8 @@ public class GithubImporterInputFilterStream
         File[] docArray = directory.listFiles(fileFilter);
         if (docArray != null) {
             Arrays.sort(docArray);
-            String parentName = this.properties.getParent().toString().replaceAll("Space ", "");
-            String[] spaces = parentName.split(KEY_DOT);
+            String parentReference = this.properties.getParent().toString().replaceAll("Space ", "");
+            String[] spaces = parentReference.split(KEY_DOT);
             for (int i = 0; i < spaces.length; i++) {
                 filterHandler.beginWikiSpace(spaces[i], FilterEventParameters.EMPTY);
                 if (i == spaces.length - 1) {
@@ -227,40 +242,107 @@ public class GithubImporterInputFilterStream
                     FilterEventParameters.EMPTY);
         createParentContent(this.properties.getParent().getName(), filterHandler);
         final String[] parentName = {""};
+        Map<String, String> additionalRepos = new HashMap<>();
+        final boolean[] headingParent = {false};
         try (Stream<String> linesStream = Files.lines(sidebar.toPath())) {
             final AtomicInteger[] parentLevel = {new AtomicInteger()};
             linesStream.forEach(line -> {
-                String pageDetailStart = line.substring(line.indexOf('['));
-                String pageLink = pageDetailStart.substring(pageDetailStart.indexOf(']') + 2);
-                String pageName = getPageName(pageLink);
-                if (!pageName.equals("")) {
-                    String pageFileName = pageName + KEY_FILE_MD;
-                    File pageFile = new File(directory, pageFileName);
-
-                    int pageLevel = line.indexOf('*') < 0 ? line.indexOf('-') : line.indexOf('*');
-                    try {
-                        if (pageLevel == 0) {
-                            parentName[0] = null;
-                        } else if (pageLevel > parentLevel[0].get()) {
-                            hierarchy.add(parentName[0]);
-                            filterHandler.beginWikiSpace(hierarchy.get(hierarchy.size() - 1),
-                                    FilterEventParameters.EMPTY);
-                        } else if (pageLevel < parentLevel[0].get()) {
+                if (line.trim().startsWith(KEY_BULLET_DASH) || line.trim().startsWith(KEY_BULLET_STERIC)) {
+                    int bulletLevel = !line.contains(KEY_BULLET_STERIC)
+                            ? line.indexOf(KEY_BULLET_DASH)
+                            : line.indexOf(KEY_BULLET_STERIC);
+                    if (line.indexOf('[') >= 0 && line.contains("github.com")) {
+                        String pageDetailStart = line.substring(line.indexOf('['));
+                        String pageLink = pageDetailStart.substring(pageDetailStart.indexOf(']') + 2);
+                        String pageName = getPageName(pageLink);
+                        logger.info("pageName is " + pageName);
+                        if (pageName.equals("")) {
+                            return;
+                        }
+                        File pageFile;
+                        String fileReference = "";
+                        if (line.contains(KEY_GIT_URL_BLOB) || line.contains(KEY_GIT_URL_TREE)) {
+                            fileReference = getSidebarFileReference(pageLink);
+                            pageLink = pageLink.split(KEY_REGEX_TREE)[0] + KEY_URL_GIT;
+                            if (!additionalRepos.containsKey(getRepoName(pageLink))) {
+                                Repository repo = gitManager.getRepository(pageLink, getRepoName(pageLink),
+                                        this.properties.getUsername(), this.properties.getAuthCode());
+                                additionalRepos.put(getRepoName(pageLink), repo.getWorkTree().getAbsolutePath());
+                                pageFile = new File(additionalRepos.get(getRepoName(pageLink)) + fileReference,
+                                        pageName);
+                            } else {
+                                pageFile = new File(additionalRepos.get(getRepoName(pageLink)) + fileReference,
+                                        pageName);
+                            }
+                        } else {
+                            String pageFileName = pageName + KEY_FILE_MD;
+                            pageFile = new File(directory, pageFileName);
+                        }
+                        try {
+                            if (bulletLevel > parentLevel[0].get()) {
+                                logger.info("Level++ , filePath is " + pageFile.getAbsolutePath());
+                                hierarchy.add(parentName[0]);
+                                filterHandler.beginWikiSpace(hierarchy.get(hierarchy.size() - 1),
+                                        FilterEventParameters.EMPTY);
+                            } else if (bulletLevel < parentLevel[0].get()) {
+                                logger.info("Level-- , filePath is " + pageFile.getAbsolutePath());
+                                filterHandler.endWikiSpace(hierarchy.get(hierarchy.size() - 1),
+                                        FilterEventParameters.EMPTY);
+                                hierarchy.remove(hierarchy.size() - 1);
+                            }
+                            readFileType(pageFile, filterHandler);
+                        } catch (Exception e) {
+                            logger.warn("exception at leveling");
+                        }
+                        parentLevel[0].set(bulletLevel);
+                        parentName[0] = pageName.endsWith(KEY_FILE_MD)
+                                ? pageName.split(KEY_FILE_MD)[0]
+                                : pageName;
+                    } else if (line.indexOf('[') < 0) {
+                        logger.info("is not [ type");
+                        String parentPageName = line.split(" ")[1];
+                        //                        hierarchy.add(parentPageName);
+//                        try {
+//                            filterHandler.beginWikiSpace(hierarchy.get(hierarchy.size() - 1),
+//                            FilterEventParameters.EMPTY);
+//                            createParentContent(hierarchy.get(hierarchy.size() - 1), filterHandler);
+//                        } catch (FilterException e) {
+//                            e.printStackTrace();
+//                        }
+                        parentLevel[0].set(bulletLevel);
+                        parentName[0] = parentPageName;
+                    }
+                } else if (line.trim().startsWith("#")) {
+                    String parentPageName = line.substring(line.indexOf(" "));
+                    if (headingParent[0]) {
+                        try {
                             filterHandler.endWikiSpace(hierarchy.get(hierarchy.size() - 1),
                                     FilterEventParameters.EMPTY);
-                            hierarchy.remove(hierarchy.size() - 1);
+                        } catch (FilterException e) {
+                            e.printStackTrace();
                         }
-                        readFileType(pageFile, filterHandler);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                        hierarchy.remove(hierarchy.size() - 1);
                     }
-
-                    parentLevel[0].set(pageLevel);
-                    parentName[0] = pageName;
+                    headingParent[0] = true;
+                    hierarchy.add(parentPageName);
+                    try {
+                        filterHandler.beginWikiSpace(hierarchy.get(hierarchy.size() - 1), FilterEventParameters.EMPTY);
+                        createParentContent(hierarchy.get(hierarchy.size() - 1), filterHandler);
+                    } catch (FilterException e) {
+                        logger.warn("error creating space in headParent #");
+                    }
                 }
             });
+            if (hierarchy.size() > 0) {
+                try {
+                    filterHandler.endWikiSpace(hierarchy.get(hierarchy.size() - 1), FilterEventParameters.EMPTY);
+                } catch (FilterException e) {
+                    e.printStackTrace();
+                }
+                hierarchy.remove(hierarchy.size() - 1);
+            }
         } catch (Exception e) {
-            throw new FilterException(ERROR_EXCEPTION, e);
+            throw new FilterException(ERROR_SIDEBAR + ERROR_EXCEPTION, e);
         }
     }
 
@@ -268,11 +350,15 @@ public class GithubImporterInputFilterStream
     {
         String pageName = "";
         if (pageLink.startsWith("http")) {
-            pageName = pageLink.substring(pageLink.lastIndexOf('/') + 1);
-            pageName = pageName.replace(")", "");
+            pageName = pageLink.substring(pageLink.lastIndexOf('/') + 1).replace(")", "");
         }
         if (pageName.equals("wiki")) {
             pageName = "Home";
+        }
+        if (pageName.contains(KEY_FILE_MD)) {
+            pageName = pageName.substring(0, pageName.indexOf(KEY_FILE_MD) + 3);
+        } else {
+            pageName = "";
         }
 
         return pageName;
@@ -323,15 +409,33 @@ public class GithubImporterInputFilterStream
 
     private void readFileType(File file, GithubImporterFilter filterHandler) throws FilterException
     {
-        if (file.getName().endsWith(KEY_FILE_MD)) {
-            readFile(file, getSyntaxParameters(KEY_MARKDOWN_GITHUB), KEY_MARKDOWN_GITHUB, filterHandler);
+        if (file.isDirectory()) {
+            filterHandler.beginWikiSpace(file.getName(), FilterEventParameters.EMPTY);
+            createParentContent(file.getName(), filterHandler);
+            readDirectoryRecursive(file.listFiles(), filterHandler);
+            filterHandler.endWikiSpace(file.getName(), FilterEventParameters.EMPTY);
+        } else {
+            if (file.getName().endsWith(KEY_FILE_MD)) {
+                readFile(file, getSyntaxParameters(KEY_MARKDOWN_GITHUB), KEY_MARKDOWN_GITHUB, filterHandler);
+            }
+            if (file.getName().endsWith(KEY_FILE_MEDIAWIKI)) {
+                readFile(file, getSyntaxParameters(KEY_MEDIAWIKI_SYNTAX), KEY_MEDIAWIKI_SYNTAX,
+                        filterHandler);
+            }
+            if (file.getName().endsWith(KEY_FILE_CREOLE)) {
+                readFile(file, getSyntaxParameters(KEY_CREOLE_SYNTAX), KEY_CREOLE_SYNTAX, filterHandler);
+            }
         }
-        if (file.getName().endsWith(KEY_FILE_MEDIAWIKI)) {
-            readFile(file, getSyntaxParameters(KEY_MEDIAWIKI_SYNTAX), KEY_MEDIAWIKI_SYNTAX,
-                    filterHandler);
+    }
+
+    private String getSidebarFileReference(String repoLink)
+    {
+        String fileReference = repoLink.split(KEY_GIT_URL_BLOB)[1].split(KEY_FORWARD_SLASH)[1];
+        if (fileReference.lastIndexOf(KEY_FORWARD_SLASH) >= 0) {
+            fileReference = fileReference.substring(0, fileReference.lastIndexOf(KEY_FORWARD_SLASH));
+        } else {
+            fileReference = "";
         }
-        if (file.getName().endsWith(KEY_FILE_CREOLE)) {
-            readFile(file, getSyntaxParameters(KEY_CREOLE_SYNTAX), KEY_CREOLE_SYNTAX, filterHandler);
-        }
+        return fileReference;
     }
 }
