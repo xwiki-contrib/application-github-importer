@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -65,6 +64,14 @@ import org.xwiki.git.GitManager;
 public class GithubImporterInputFilterStream
     extends AbstractBeanInputFilterStream<GithubImporterInputProperties, GithubImporterFilter>
 {
+    private static final String ERROR_EXCEPTION = "Error: An Exception was thrown.";
+
+    private static final String KEY_URL_GIT = ".git";
+
+    private static final String KEY_FILE_MD = ".md";
+
+    private static final String KEY_FORWARD_SLASH = "/";
+
     private static final String KEY_DOT = "\\.";
 
     private static final String KEY_MARKDOWN_GITHUB = "markdown+github/1.0";
@@ -75,36 +82,39 @@ public class GithubImporterInputFilterStream
 
     private static final String KEY_XWIKI_SYNTAX = "xwiki/2.1";
 
-    private static final String KEY_URL_GIT = ".git";
-
     private static final String KEY_WEBHOME = "WebHome";
 
     private static final String KEY_ZIP = ".zip";
 
-    private static final String KEY_FORWARD_SLASH = "/";
-
     private static final String KEY_GITHUB_IMPORTER_TEMPDIR = "GithubImporter";
-
-    private static final String KEY_FILE_MD = ".md";
 
     private static final String KEY_FILE_MEDIAWIKI = ".mediawiki";
 
     private static final String KEY_FILE_CREOLE = ".creole";
 
-    private static final String KEY_GIT_URL_BLOB = "/blob/";
-
     private static final String KEY_GIT_URL_TREE = "/tree/";
+
+    private static final String KEY_GIT_URL_BLOB = "/blob/";
 
     private static final String KEY_BULLET_DASH = "-";
 
     private static final String KEY_BULLET_STERIC = "*";
 
-    private static final String KEY_REGEX_TREE = "/blob/|/tree/";
+    private static final String KEY_SQUARE_BRACKET_START = "[";
+
+    private static final String KEY_SQUARE_BRACKET_END = "]";
+
+    private static final String KEY_REGEX_TREE = "(/blob/)|(/tree/)";
 
     private static final String ERROR_SIDEBAR = "Sidebar is unreadable or unsupported. Please uncheck Create Hierarchy"
             + " or fix the Sidebar. ";
 
-    private static final String ERROR_EXCEPTION = "Error: An Exception was thrown.";
+    private String parentName = "";
+
+    private int parentLevel;
+
+    @Inject
+    private Logger logger;
 
     @Inject
     private GitManager gitManager;
@@ -123,9 +133,6 @@ public class GithubImporterInputFilterStream
 
     @Inject
     private GithubImporterFileCatcher fileCatcher;
-
-    @Inject
-    private Logger logger;
 
     @Override
     protected void read(Object filter, GithubImporterFilter filterHandler) throws FilterException
@@ -234,136 +241,6 @@ public class GithubImporterInputFilterStream
         }
     }
 
-    private void readSidebar(File sidebar, File directory, GithubImporterFilter filterHandler) throws FilterException
-    {
-        ArrayList<String> hierarchy = new ArrayList<>();
-        hierarchy.add(this.properties.getParent().getName());
-        filterHandler.beginWikiSpace(hierarchy.get(hierarchy.size() - 1),
-                    FilterEventParameters.EMPTY);
-        createParentContent(this.properties.getParent().getName(), filterHandler);
-        final String[] parentName = {""};
-        Map<String, String> additionalRepos = new HashMap<>();
-        final boolean[] headingParent = {false};
-        try (Stream<String> linesStream = Files.lines(sidebar.toPath())) {
-            final AtomicInteger[] parentLevel = {new AtomicInteger()};
-            linesStream.forEach(line -> {
-                if (line.trim().startsWith(KEY_BULLET_DASH) || line.trim().startsWith(KEY_BULLET_STERIC)) {
-                    int bulletLevel = !line.contains(KEY_BULLET_STERIC)
-                            ? line.indexOf(KEY_BULLET_DASH)
-                            : line.indexOf(KEY_BULLET_STERIC);
-                    if (line.indexOf('[') >= 0 && line.contains("github.com")) {
-                        String pageDetailStart = line.substring(line.indexOf('['));
-                        String pageLink = pageDetailStart.substring(pageDetailStart.indexOf(']') + 2);
-                        String pageName = getPageName(pageLink);
-                        logger.info("pageName is " + pageName);
-                        if (pageName.equals("")) {
-                            return;
-                        }
-                        File pageFile;
-                        String fileReference = "";
-                        if (line.contains(KEY_GIT_URL_BLOB) || line.contains(KEY_GIT_URL_TREE)) {
-                            fileReference = getSidebarFileReference(pageLink);
-                            pageLink = pageLink.split(KEY_REGEX_TREE)[0] + KEY_URL_GIT;
-                            if (!additionalRepos.containsKey(getRepoName(pageLink))) {
-                                Repository repo = gitManager.getRepository(pageLink, getRepoName(pageLink),
-                                        this.properties.getUsername(), this.properties.getAuthCode());
-                                additionalRepos.put(getRepoName(pageLink), repo.getWorkTree().getAbsolutePath());
-                                pageFile = new File(additionalRepos.get(getRepoName(pageLink)) + fileReference,
-                                        pageName);
-                            } else {
-                                pageFile = new File(additionalRepos.get(getRepoName(pageLink)) + fileReference,
-                                        pageName);
-                            }
-                        } else {
-                            String pageFileName = pageName + KEY_FILE_MD;
-                            pageFile = new File(directory, pageFileName);
-                        }
-                        try {
-                            if (bulletLevel > parentLevel[0].get()) {
-                                logger.info("Level++ , filePath is " + pageFile.getAbsolutePath());
-                                hierarchy.add(parentName[0]);
-                                filterHandler.beginWikiSpace(hierarchy.get(hierarchy.size() - 1),
-                                        FilterEventParameters.EMPTY);
-                            } else if (bulletLevel < parentLevel[0].get()) {
-                                logger.info("Level-- , filePath is " + pageFile.getAbsolutePath());
-                                filterHandler.endWikiSpace(hierarchy.get(hierarchy.size() - 1),
-                                        FilterEventParameters.EMPTY);
-                                hierarchy.remove(hierarchy.size() - 1);
-                            }
-                            readFileType(pageFile, filterHandler);
-                        } catch (Exception e) {
-                            logger.warn("exception at leveling");
-                        }
-                        parentLevel[0].set(bulletLevel);
-                        parentName[0] = pageName.endsWith(KEY_FILE_MD)
-                                ? pageName.split(KEY_FILE_MD)[0]
-                                : pageName;
-                    } else if (line.indexOf('[') < 0) {
-                        logger.info("is not [ type");
-                        String parentPageName = line.split(" ")[1];
-                        //                        hierarchy.add(parentPageName);
-//                        try {
-//                            filterHandler.beginWikiSpace(hierarchy.get(hierarchy.size() - 1),
-//                            FilterEventParameters.EMPTY);
-//                            createParentContent(hierarchy.get(hierarchy.size() - 1), filterHandler);
-//                        } catch (FilterException e) {
-//                            e.printStackTrace();
-//                        }
-                        parentLevel[0].set(bulletLevel);
-                        parentName[0] = parentPageName;
-                    }
-                } else if (line.trim().startsWith("#")) {
-                    String parentPageName = line.substring(line.indexOf(" "));
-                    if (headingParent[0]) {
-                        try {
-                            filterHandler.endWikiSpace(hierarchy.get(hierarchy.size() - 1),
-                                    FilterEventParameters.EMPTY);
-                        } catch (FilterException e) {
-                            e.printStackTrace();
-                        }
-                        hierarchy.remove(hierarchy.size() - 1);
-                    }
-                    headingParent[0] = true;
-                    hierarchy.add(parentPageName);
-                    try {
-                        filterHandler.beginWikiSpace(hierarchy.get(hierarchy.size() - 1), FilterEventParameters.EMPTY);
-                        createParentContent(hierarchy.get(hierarchy.size() - 1), filterHandler);
-                    } catch (FilterException e) {
-                        logger.warn("error creating space in headParent #");
-                    }
-                }
-            });
-            if (hierarchy.size() > 0) {
-                try {
-                    filterHandler.endWikiSpace(hierarchy.get(hierarchy.size() - 1), FilterEventParameters.EMPTY);
-                } catch (FilterException e) {
-                    e.printStackTrace();
-                }
-                hierarchy.remove(hierarchy.size() - 1);
-            }
-        } catch (Exception e) {
-            throw new FilterException(ERROR_SIDEBAR + ERROR_EXCEPTION, e);
-        }
-    }
-
-    private String getPageName(String pageLink)
-    {
-        String pageName = "";
-        if (pageLink.startsWith("http")) {
-            pageName = pageLink.substring(pageLink.lastIndexOf('/') + 1).replace(")", "");
-        }
-        if (pageName.equals("wiki")) {
-            pageName = "Home";
-        }
-        if (pageName.contains(KEY_FILE_MD)) {
-            pageName = pageName.substring(0, pageName.indexOf(KEY_FILE_MD) + 3);
-        } else {
-            pageName = "";
-        }
-
-        return pageName;
-    }
-
     private void readDirectoryRecursive(File[] docArray, GithubImporterFilter filterHandler) throws FilterException
     {
         if (docArray != null) {
@@ -428,14 +305,157 @@ public class GithubImporterInputFilterStream
         }
     }
 
+    private void readSidebar(File sidebar, File directory, GithubImporterFilter filterHandler) throws FilterException
+    {
+        ArrayList<String> hierarchy = new ArrayList<>();
+        addParentToHierarchy(hierarchy, filterHandler);
+        Map<String, String> additionalRepos = new HashMap<>();
+        final boolean[] headingParent = {false};
+        try (Stream<String> linesStream = Files.lines(sidebar.toPath())) {
+            linesStream.forEach(line -> {
+                if (line.trim().startsWith(KEY_BULLET_DASH) || line.trim().startsWith(KEY_BULLET_STERIC)) {
+                    readLevels(line, additionalRepos, directory, hierarchy, filterHandler);
+                } else if (line.trim().startsWith("#")) {
+                    String parentPageName = line.substring(line.indexOf(" "));
+                    if (headingParent[0]) {
+                        try {
+                            filterHandler.endWikiSpace(hierarchy.get(hierarchy.size() - 1),
+                                    FilterEventParameters.EMPTY);
+                        } catch (FilterException e) {
+                            e.printStackTrace();
+                        }
+                        hierarchy.remove(hierarchy.size() - 1);
+                    }
+                    headingParent[0] = true;
+                    hierarchy.add(parentPageName);
+                    try {
+                        filterHandler.beginWikiSpace(hierarchy.get(hierarchy.size() - 1), FilterEventParameters.EMPTY);
+                        createParentContent(hierarchy.get(hierarchy.size() - 1), filterHandler);
+                    } catch (FilterException e) {
+                        logger.warn("error creating space in headParent #");
+                    }
+                }
+            });
+            if (hierarchy.size() > 0) {
+                try {
+                    filterHandler.endWikiSpace(hierarchy.get(hierarchy.size() - 1), FilterEventParameters.EMPTY);
+                } catch (FilterException e) {
+                    e.printStackTrace();
+                }
+                hierarchy.remove(hierarchy.size() - 1);
+            }
+        } catch (Exception e) {
+            throw new FilterException(ERROR_SIDEBAR + ERROR_EXCEPTION, e);
+        }
+    }
+
     private String getSidebarFileReference(String repoLink)
     {
-        String fileReference = repoLink.split(KEY_GIT_URL_BLOB)[1].split(KEY_FORWARD_SLASH)[1];
+        String fileReference = repoLink.split(KEY_REGEX_TREE)[1].split(KEY_FORWARD_SLASH)[1];
         if (fileReference.lastIndexOf(KEY_FORWARD_SLASH) >= 0) {
             fileReference = fileReference.substring(0, fileReference.lastIndexOf(KEY_FORWARD_SLASH));
         } else {
             fileReference = "";
         }
         return fileReference;
+    }
+
+    private String getPageName(String pageLink)
+    {
+        String pageName = "";
+        if (pageLink.startsWith("http")) {
+            pageName = pageLink.substring(pageLink.lastIndexOf('/') + 1);
+            pageName = pageName.substring(0, pageName.indexOf(")"));
+        }
+        if (pageName.equals("wiki")) {
+            pageName = "Home";
+        }
+
+        return pageName;
+    }
+
+    private void addParentToHierarchy(ArrayList<String> hierarchy, GithubImporterFilter filterHandler)
+            throws FilterException
+    {
+        hierarchy.add(this.properties.getParent().getName());
+        filterHandler.beginWikiSpace(hierarchy.get(hierarchy.size() - 1),
+                FilterEventParameters.EMPTY);
+        createParentContent(this.properties.getParent().getName(), filterHandler);
+    }
+
+    private void readLevels(String line, Map<String, String> additionalRepos, File directory,
+                            ArrayList<String> hierarchy, GithubImporterFilter filterHandler)
+    {
+        int bulletLevel = !line.contains(KEY_BULLET_STERIC)
+                ? line.indexOf(KEY_BULLET_DASH)
+                : line.indexOf(KEY_BULLET_STERIC);
+        if (line.contains(KEY_SQUARE_BRACKET_START) && line.contains("github.com")) {
+            String pageDetailStart = line.substring(line.indexOf(KEY_SQUARE_BRACKET_START));
+            String pageLink = pageDetailStart.substring(pageDetailStart.indexOf(KEY_SQUARE_BRACKET_END) + 2);
+            String pageName = getPageName(pageLink);
+            logger.info("readLevels; pageName is " + pageName);
+            if (pageName.equals("")) {
+                return;
+            }
+            File pageFile = getFileFromHierarchy(line, pageName, pageLink, additionalRepos, directory);
+            try {
+                readBulletLevel(bulletLevel, pageFile, hierarchy, filterHandler);
+            } catch (Exception e) {
+                logger.warn("exception at leveling");
+            }
+            parentLevel = bulletLevel;
+            parentName = pageName.endsWith(KEY_FILE_MD) ? pageName.split(KEY_FILE_MD)[0] : pageName;
+        } else if (!line.contains(KEY_SQUARE_BRACKET_START)) {
+            logger.info("is not [ type");
+            String parentPageName = line.substring(line.indexOf(" "));
+            parentLevel = bulletLevel;
+            parentName = parentPageName;
+        }
+    }
+
+    private File getAdditionalRepoFile(String pageLink, Map<String, String> additionalRepos, String pageName)
+    {
+        String fileReference = getSidebarFileReference(pageLink);
+        String repoLink = pageLink.split(KEY_REGEX_TREE)[0] + KEY_URL_GIT;
+        if (!additionalRepos.containsKey(getRepoName(repoLink))) {
+            Repository repo = gitManager.getRepository(repoLink, getRepoName(repoLink),
+                    this.properties.getUsername(), this.properties.getAuthCode());
+            additionalRepos.put(getRepoName(repoLink), repo.getWorkTree().getAbsolutePath());
+            return new File(additionalRepos.get(getRepoName(repoLink)) + fileReference, pageName);
+        } else {
+            return new File(additionalRepos.get(getRepoName(repoLink)) + fileReference, pageName);
+        }
+    }
+
+    private void readBulletLevel(int bulletLevel, File pageFile, ArrayList<String> hierarchy,
+                                 GithubImporterFilter filterHandler) throws FilterException
+    {
+        logger.info("readBulletLevel;  ");
+        if (bulletLevel > parentLevel) {
+            logger.info("Level++ , filePath is " + pageFile.getAbsolutePath());
+            hierarchy.add(parentName);
+            filterHandler.beginWikiSpace(hierarchy.get(hierarchy.size() - 1), FilterEventParameters.EMPTY);
+        } else if (bulletLevel < parentLevel) {
+            logger.info("Level-- , filePath is " + pageFile.getAbsolutePath());
+            filterHandler.endWikiSpace(hierarchy.get(hierarchy.size() - 1), FilterEventParameters.EMPTY);
+            hierarchy.remove(hierarchy.size() - 1);
+        } else {
+            logger.info("readBulletLevel; Levelelse ");
+        }
+        readFileType(pageFile, filterHandler);
+    }
+
+    private File getFileFromHierarchy(String line, String pageName, String pageLink,
+                                      Map<String, String> additionalRepos, File directory)
+    {
+        if ((line.contains(KEY_GIT_URL_BLOB) || line.contains(KEY_GIT_URL_TREE))
+                && pageName.endsWith(KEY_FILE_MD)) {
+            logger.info("readLevels; blob/tree ");
+            return getAdditionalRepoFile(pageLink, additionalRepos, pageName);
+        } else {
+            logger.info("readLevels; wiki ");
+            String pageFileName = pageName + KEY_FILE_MD;
+            return new File(directory, pageFileName);
+        }
     }
 }
