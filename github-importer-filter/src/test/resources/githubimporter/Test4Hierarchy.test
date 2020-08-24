@@ -452,7 +452,7 @@ Underscores&#xd;
   </wikiSpace></wikiSpace>
 .#------------------------------------------------------------------------------
 .input|githubimporter+wiki
-.configuration.source=TestRepoHaxsen
+.configuration.source=TestRepo
 .configuration.parent=GitImp
 .configuration.createHierarchy=true
 .#------------------------------------------------------------------------------

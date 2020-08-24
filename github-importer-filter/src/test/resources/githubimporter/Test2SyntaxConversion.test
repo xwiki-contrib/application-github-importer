@@ -1281,7 +1281,7 @@ A Repository for GitHub testing.</string>
 </wikiSpace>
 .#------------------------------------------------------------------------------
 .input|githubimporter+wiki
-.configuration.source=TestRepoHaxsen
+.configuration.source=TestRepo
 .configuration.parent=GitImp
 .configuration.convertSyntax=true
 .#------------------------------------------------------------------------------
