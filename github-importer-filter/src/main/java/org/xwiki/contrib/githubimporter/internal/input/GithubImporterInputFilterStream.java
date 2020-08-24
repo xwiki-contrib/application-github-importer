@@ -96,13 +96,15 @@ public class GithubImporterInputFilterStream
 
     private static final String KEY_GIT_URL_BLOB = "/blob/";
 
-    private static final String KEY_BULLET_DASH = "-";
+    private static final String KEY_BULLET_DASH = "- ";
 
-    private static final String KEY_BULLET_STERIC = "*";
+    private static final String KEY_BULLET_STERIC = "* ";
 
     private static final String KEY_SQUARE_BRACKET_START = "[";
 
     private static final String KEY_SQUARE_BRACKET_END = "]";
+
+    private static final String KEY_HASH = "#";
 
     private static final String KEY_REGEX_TREE = "(/blob/)|(/tree/)";
 
@@ -311,36 +313,27 @@ public class GithubImporterInputFilterStream
         addParentToHierarchy(hierarchy, filterHandler);
         Map<String, String> additionalRepos = new HashMap<>();
         final boolean[] headingParent = {false};
+        final String[] tempLineCatched = {""};
+        final String[] lastSpace = {""};
         try (Stream<String> linesStream = Files.lines(sidebar.toPath())) {
             linesStream.forEach(line -> {
                 if (line.trim().startsWith(KEY_BULLET_DASH) || line.trim().startsWith(KEY_BULLET_STERIC)) {
                     readLevels(line, additionalRepos, directory, hierarchy, filterHandler);
-                } else if (line.trim().startsWith("#")) {
-                    String parentPageName = line.substring(line.indexOf(" "));
-                    if (headingParent[0]) {
-                        try {
-                            filterHandler.endWikiSpace(hierarchy.get(hierarchy.size() - 1),
-                                    FilterEventParameters.EMPTY);
-                        } catch (FilterException e) {
-                            e.printStackTrace();
-                        }
-                        hierarchy.remove(hierarchy.size() - 1);
-                    }
-                    headingParent[0] = true;
-                    hierarchy.add(parentPageName);
-                    try {
-                        filterHandler.beginWikiSpace(hierarchy.get(hierarchy.size() - 1), FilterEventParameters.EMPTY);
-                        createParentContent(hierarchy.get(hierarchy.size() - 1), filterHandler);
-                    } catch (FilterException e) {
-                        logger.warn("error creating space in headParent #");
-                    }
+                } else if (line.trim().startsWith(KEY_HASH)) {
+                    headingParent[0] = readHeadingTypeLevel(line, headingParent[0], filterHandler, hierarchy);
+                } else if (line.trim().startsWith("[[")) {
+                    readDirectHeadingFile(line, directory, filterHandler);
+                } else if (line.startsWith("---")) {
+                    startUnderlinedHeadingSpace(hierarchy, filterHandler, tempLineCatched[0]);
+                } else {
+                    tempLineCatched[0] = line;
                 }
             });
             if (hierarchy.size() > 0) {
                 try {
                     filterHandler.endWikiSpace(hierarchy.get(hierarchy.size() - 1), FilterEventParameters.EMPTY);
                 } catch (FilterException e) {
-                    e.printStackTrace();
+                    logger.warn("couldnt end space for hierarchy > 0");
                 }
                 hierarchy.remove(hierarchy.size() - 1);
             }
@@ -456,6 +449,71 @@ public class GithubImporterInputFilterStream
             logger.info("readLevels; wiki ");
             String pageFileName = pageName + KEY_FILE_MD;
             return new File(directory, pageFileName);
+        }
+    }
+
+    private boolean readHeadingTypeLevel(String line, boolean headingParent, GithubImporterFilter filterHandler,
+                                         ArrayList<String> hierarchy)
+    {
+        String parentPageName = line.substring(line.indexOf(" "));
+        if (headingParent) {
+            try {
+                filterHandler.endWikiSpace(hierarchy.get(hierarchy.size() - 1),
+                        FilterEventParameters.EMPTY);
+            } catch (FilterException e) {
+                e.printStackTrace();
+            }
+            hierarchy.remove(hierarchy.size() - 1);
+        }
+        hierarchy.add(parentPageName);
+        try {
+            filterHandler.beginWikiSpace(hierarchy.get(hierarchy.size() - 1), FilterEventParameters.EMPTY);
+            createParentContent(hierarchy.get(hierarchy.size() - 1), filterHandler);
+        } catch (FilterException e) {
+            logger.warn("error creating space in headParent #");
+        }
+        return true;
+    }
+
+    private void readDirectHeadingFile(String line, File directory, GithubImporterFilter filterHandler)
+    {
+        int nameIndex = line.lastIndexOf("|");
+        nameIndex = nameIndex < 0 ? nameIndex + 3 : nameIndex + 1;
+        String pageFileName = line.substring(nameIndex, line.lastIndexOf("]]"));
+        if (pageFileName.contains(KEY_HASH)) {
+            pageFileName = pageFileName.substring(0, pageFileName.lastIndexOf(KEY_HASH));
+        }
+        logger.info("[[ type; filename is " + pageFileName + KEY_FILE_MD);
+        try {
+            readFileType(new File(directory, pageFileName + KEY_FILE_MD), filterHandler);
+        } catch (Exception e) {
+            logger.warn("error reading [[ type, trying using - dash");
+            try {
+                readFileType(new File(directory, pageFileName.replace(" ", "-") + KEY_FILE_MD), filterHandler);
+            } catch (Exception e2) {
+                logger.warn("didnt work using - dash, skipping file");
+            }
+        }
+    }
+
+    private void startUnderlinedHeadingSpace(ArrayList<String> hierarchy, GithubImporterFilter filterHandler,
+                                             String tempLineCatched)
+    {
+        if (hierarchy.size() > 1) {
+            try {
+                filterHandler.endWikiSpace(hierarchy.get(hierarchy.size() - 1),
+                        FilterEventParameters.EMPTY);
+                hierarchy.remove(hierarchy.size() - 1);
+            } catch (Exception e) {
+                logger.warn("couldnt end space for -- type heading");
+            }
+        }
+        try {
+            hierarchy.add(tempLineCatched);
+            filterHandler.beginWikiSpace(hierarchy.get(hierarchy.size() - 1), FilterEventParameters.EMPTY);
+            createParentContent(hierarchy.get(hierarchy.size() - 1), filterHandler);
+        } catch (Exception e) {
+            logger.warn("couldnt create space for -- type heading");
         }
     }
 }

@@ -31,7 +31,7 @@
 
     <groupId>org.xwiki.contrib.github-importer</groupId>
     <artifactId>github-importer-test</artifactId>
-    <version>${project.version}</version>
+    <version>1.5-SNAPSHOT</version>
     <name>GitHub Importer - Tests - Parent POM</name>
     <packaging>pom</packaging>
     <description>GitHub Importer - Tests - Parent POM</description>
