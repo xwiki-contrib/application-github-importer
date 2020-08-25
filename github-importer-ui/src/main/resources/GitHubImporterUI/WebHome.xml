@@ -58,9 +58,8 @@
         #end&#xd;
       #end&#xd;
       #if ($propertyName.startsWith('parent'))&#xd;
-        #set($hql="select count(doc) from XWikiDocument doc where doc.space = ?")&#xd;
-        #set($docsInSpace = $xwiki.search($hql, 1, 0, [$paramValue]))&#xd;
-        #if ($docsInSpace.get(0) > 0)&#xd;
+        #set ($parentName = $paramValue.substring($paramValue.lastIndexOf('.') + 1))&#xd;
+        #if ($xwiki.getSpaces().contains($parentName))&#xd;
           #set ($parentValidationError = "$services.localization.render('githubimporter.validation.parent')")&#xd;
         #end&#xd;
       #end&#xd;
