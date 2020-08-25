@@ -1,0 +1,459 @@
+.#------------------------------------------------------------------------------
+.expect|filter+xml
+.#------------------------------------------------------------------------------
+<wikiSpace name="Space1">
+  <wikiSpace name="Space2">
+    <wikiDocument name="WebHome">
+      <p>
+        <parameters>
+          <entry>
+            <string>syntax</string>
+            <string>xwiki/2.1</string>
+          </entry>
+          <entry>
+            <string>content</string>
+            <string>{{documents location="Space2." columns="doc.title,doc.location,doc.date"}}</string>
+          </entry>
+        </parameters>
+      </p>
+    </wikiDocument>
+    <wikiSpace name="Home">
+      <p>
+        <parameters>
+          <entry>
+            <string>syntax</string>
+            <string>markdown+github/1.0</string>
+          </entry>
+          <entry>
+            <string>content</string>
+            <string>Welcome to the TestRepo wiki!&#xd;
+&#xd;
+This repo is created for testing purposes, such as importing the wikis into another platform.&#xd;
+&#xd;
+# H1&#xd;
+## H2&#xd;
+### H3&#xd;
+#### H4&#xd;
+##### H5&#xd;
+###### H6&#xd;
+&#xd;
+Alternatively, for H1 and H2, an underline-ish style:&#xd;
+&#xd;
+Alt-H1&#xd;
+======&#xd;
+&#xd;
+Alt-H2&#xd;
+------&#xd;
+&#xd;
+Emphasis, aka italics, with *asterisks* or _underscores_.&#xd;
+&#xd;
+Strong emphasis, aka bold, with **asterisks** or __underscores__.&#xd;
+&#xd;
+Combined emphasis with **asterisks and _underscores_**.&#xd;
+&#xd;
+Strikethrough uses two tildes. ~~Scratch this.~~&#xd;
+&#xd;
+1. First ordered list item&#xd;
+2. Another item&#xd;
+⋅⋅* Unordered sub-list. &#xd;
+1. Actual numbers don't matter, just that it's a number&#xd;
+⋅⋅1. Ordered sub-list&#xd;
+4. And another item.&#xd;
+&#xd;
+⋅⋅⋅You can have properly indented paragraphs within list items. Notice the blank line above, and the leading spaces (at least one, but we'll use three here to also align the raw Markdown).&#xd;
+&#xd;
+⋅⋅⋅To have a line break without a paragraph, you will need to use two trailing spaces.⋅⋅&#xd;
+⋅⋅⋅Note that this line is separate, but within the same paragraph.⋅⋅&#xd;
+⋅⋅⋅(This is contrary to the typical GFM line break behaviour, where trailing spaces are not required.)&#xd;
+&#xd;
+* Unordered list can use asterisks&#xd;
+- Or minuses&#xd;
++ Or pluses&#xd;
+&#xd;
+[I'm an inline-style link](https://www.google.com)&#xd;
+&#xd;
+[I'm an inline-style link with title](https://www.google.com "Google's Homepage")&#xd;
+&#xd;
+[I'm a reference-style link][Arbitrary case-insensitive reference text]&#xd;
+&#xd;
+[I'm a relative reference to a repository file](../blob/master/LICENSE)&#xd;
+&#xd;
+[You can use numbers for reference-style link definitions][1]&#xd;
+&#xd;
+Or leave it empty and use the [link text itself].&#xd;
+&#xd;
+URLs and URLs in angle brackets will automatically get turned into links. &#xd;
+http://www.example.com or &lt;http://www.example.com> and sometimes &#xd;
+example.com (but not on Github, for example).&#xd;
+&#xd;
+Some text to show that the reference links can follow later.&#xd;
+&#xd;
+[arbitrary case-insensitive reference text]: https://www.mozilla.org&#xd;
+[1]: http://slashdot.org&#xd;
+[link text itself]: http://www.reddit.com&#xd;
+&#xd;
+Here's our logo (hover to see the title text):&#xd;
+&#xd;
+Inline-style: &#xd;
+![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 1")&#xd;
+&#xd;
+Reference-style: &#xd;
+![alt text][logo]&#xd;
+&#xd;
+[logo]: https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 2"&#xd;
+&#xd;
+Inline `code` has `back-ticks around` it.&#xd;
+&#xd;
+```javascript&#xd;
+var s = "JavaScript syntax highlighting";&#xd;
+alert(s);&#xd;
+```&#xd;
+ &#xd;
+```python&#xd;
+s = "Python syntax highlighting"&#xd;
+print s&#xd;
+```&#xd;
+ &#xd;
+```&#xd;
+No language indicated, so no syntax highlighting. &#xd;
+But let's throw in a &lt;b>tag&lt;/b>.&#xd;
+```&#xd;
+&#xd;
+Colons can be used to align columns.&#xd;
+&#xd;
+| Tables        | Are           | Cool  |&#xd;
+| ------------- |:-------------:| -----:|&#xd;
+| col 3 is      | right-aligned | $1600 |&#xd;
+| col 2 is      | centered      |   $12 |&#xd;
+| zebra stripes | are neat      |    $1 |&#xd;
+&#xd;
+There must be at least 3 dashes separating each header cell.&#xd;
+The outer pipes (|) are optional, and you don't need to make the &#xd;
+raw Markdown line up prettily. You can also use inline Markdown.&#xd;
+&#xd;
+Markdown | Less | Pretty&#xd;
+--- | --- | ---&#xd;
+*Still* | `renders` | **nicely**&#xd;
+1 | 2 | 3&#xd;
+&#xd;
+> Blockquotes are very handy in email to emulate reply text.&#xd;
+> This line is part of the same quote.&#xd;
+&#xd;
+Quote break.&#xd;
+&#xd;
+> This is a very long line that will still be quoted properly when it wraps. Oh boy let's keep writing to make sure this is long enough to actually wrap for everyone. Oh, you can *put* **Markdown** into a blockquote. &#xd;
+&#xd;
+Three or more...&#xd;
+&#xd;
+---&#xd;
+&#xd;
+Hyphens&#xd;
+&#xd;
+***&#xd;
+&#xd;
+Asterisks&#xd;
+&#xd;
+___&#xd;
+&#xd;
+Underscores&#xd;
+&#xd;
+</string>
+          </entry>
+        </parameters>
+      </p>
+      <wikiDocument name="WebHome">
+        <p>
+          <parameters>
+            <entry>
+              <string>syntax</string>
+              <string>markdown+github/1.0</string>
+            </entry>
+            <entry>
+              <string>content</string>
+              <string>Welcome to the TestRepo wiki!&#xd;
+&#xd;
+This repo is created for testing purposes, such as importing the wikis into another platform.&#xd;
+&#xd;
+# H1&#xd;
+## H2&#xd;
+### H3&#xd;
+#### H4&#xd;
+##### H5&#xd;
+###### H6&#xd;
+&#xd;
+Alternatively, for H1 and H2, an underline-ish style:&#xd;
+&#xd;
+Alt-H1&#xd;
+======&#xd;
+&#xd;
+Alt-H2&#xd;
+------&#xd;
+&#xd;
+Emphasis, aka italics, with *asterisks* or _underscores_.&#xd;
+&#xd;
+Strong emphasis, aka bold, with **asterisks** or __underscores__.&#xd;
+&#xd;
+Combined emphasis with **asterisks and _underscores_**.&#xd;
+&#xd;
+Strikethrough uses two tildes. ~~Scratch this.~~&#xd;
+&#xd;
+1. First ordered list item&#xd;
+2. Another item&#xd;
+⋅⋅* Unordered sub-list. &#xd;
+1. Actual numbers don't matter, just that it's a number&#xd;
+⋅⋅1. Ordered sub-list&#xd;
+4. And another item.&#xd;
+&#xd;
+⋅⋅⋅You can have properly indented paragraphs within list items. Notice the blank line above, and the leading spaces (at least one, but we'll use three here to also align the raw Markdown).&#xd;
+&#xd;
+⋅⋅⋅To have a line break without a paragraph, you will need to use two trailing spaces.⋅⋅&#xd;
+⋅⋅⋅Note that this line is separate, but within the same paragraph.⋅⋅&#xd;
+⋅⋅⋅(This is contrary to the typical GFM line break behaviour, where trailing spaces are not required.)&#xd;
+&#xd;
+* Unordered list can use asterisks&#xd;
+- Or minuses&#xd;
++ Or pluses&#xd;
+&#xd;
+[I'm an inline-style link](https://www.google.com)&#xd;
+&#xd;
+[I'm an inline-style link with title](https://www.google.com "Google's Homepage")&#xd;
+&#xd;
+[I'm a reference-style link][Arbitrary case-insensitive reference text]&#xd;
+&#xd;
+[I'm a relative reference to a repository file](../blob/master/LICENSE)&#xd;
+&#xd;
+[You can use numbers for reference-style link definitions][1]&#xd;
+&#xd;
+Or leave it empty and use the [link text itself].&#xd;
+&#xd;
+URLs and URLs in angle brackets will automatically get turned into links. &#xd;
+http://www.example.com or &lt;http://www.example.com> and sometimes &#xd;
+example.com (but not on Github, for example).&#xd;
+&#xd;
+Some text to show that the reference links can follow later.&#xd;
+&#xd;
+[arbitrary case-insensitive reference text]: https://www.mozilla.org&#xd;
+[1]: http://slashdot.org&#xd;
+[link text itself]: http://www.reddit.com&#xd;
+&#xd;
+Here's our logo (hover to see the title text):&#xd;
+&#xd;
+Inline-style: &#xd;
+![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 1")&#xd;
+&#xd;
+Reference-style: &#xd;
+![alt text][logo]&#xd;
+&#xd;
+[logo]: https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 2"&#xd;
+&#xd;
+Inline `code` has `back-ticks around` it.&#xd;
+&#xd;
+```javascript&#xd;
+var s = "JavaScript syntax highlighting";&#xd;
+alert(s);&#xd;
+```&#xd;
+ &#xd;
+```python&#xd;
+s = "Python syntax highlighting"&#xd;
+print s&#xd;
+```&#xd;
+ &#xd;
+```&#xd;
+No language indicated, so no syntax highlighting. &#xd;
+But let's throw in a &lt;b>tag&lt;/b>.&#xd;
+```&#xd;
+&#xd;
+Colons can be used to align columns.&#xd;
+&#xd;
+| Tables        | Are           | Cool  |&#xd;
+| ------------- |:-------------:| -----:|&#xd;
+| col 3 is      | right-aligned | $1600 |&#xd;
+| col 2 is      | centered      |   $12 |&#xd;
+| zebra stripes | are neat      |    $1 |&#xd;
+&#xd;
+There must be at least 3 dashes separating each header cell.&#xd;
+The outer pipes (|) are optional, and you don't need to make the &#xd;
+raw Markdown line up prettily. You can also use inline Markdown.&#xd;
+&#xd;
+Markdown | Less | Pretty&#xd;
+--- | --- | ---&#xd;
+*Still* | `renders` | **nicely**&#xd;
+1 | 2 | 3&#xd;
+&#xd;
+> Blockquotes are very handy in email to emulate reply text.&#xd;
+> This line is part of the same quote.&#xd;
+&#xd;
+Quote break.&#xd;
+&#xd;
+> This is a very long line that will still be quoted properly when it wraps. Oh boy let's keep writing to make sure this is long enough to actually wrap for everyone. Oh, you can *put* **Markdown** into a blockquote. &#xd;
+&#xd;
+Three or more...&#xd;
+&#xd;
+---&#xd;
+&#xd;
+Hyphens&#xd;
+&#xd;
+***&#xd;
+&#xd;
+Asterisks&#xd;
+&#xd;
+___&#xd;
+&#xd;
+Underscores&#xd;
+&#xd;
+</string>
+            </entry>
+          </parameters>
+        </p>
+      </wikiDocument>
+    </wikiSpace>
+    <wikiSpace name="Tests">
+      <p>
+        <parameters>
+          <entry>
+            <string>syntax</string>
+            <string>markdown+github/1.0</string>
+          </entry>
+          <entry>
+            <string>content</string>
+            <string>Ts</string>
+          </entry>
+        </parameters>
+      </p>
+      <wikiDocument name="WebHome">
+        <p>
+          <parameters>
+            <entry>
+              <string>syntax</string>
+              <string>markdown+github/1.0</string>
+            </entry>
+            <entry>
+              <string>content</string>
+              <string>Ts</string>
+            </entry>
+          </parameters>
+        </p>
+      </wikiDocument>
+    </wikiSpace>
+    <wikiSpace name="Tests">
+      <wikiSpace name="Test1">
+        <p>
+          <parameters>
+            <entry>
+              <string>syntax</string>
+              <string>markdown+github/1.0</string>
+            </entry>
+            <entry>
+              <string>content</string>
+              <string># T1</string>
+            </entry>
+          </parameters>
+        </p>
+        <wikiDocument name="WebHome">
+          <p>
+            <parameters>
+              <entry>
+                <string>syntax</string>
+                <string>markdown+github/1.0</string>
+              </entry>
+              <entry>
+                <string>content</string>
+                <string># T1</string>
+              </entry>
+            </parameters>
+          </p>
+        </wikiDocument>
+      </wikiSpace>
+      <wikiSpace name="Test1">
+        <wikiSpace name="Test1a">
+          <p>
+            <parameters>
+              <entry>
+                <string>syntax</string>
+                <string>markdown+github/1.0</string>
+              </entry>
+              <entry>
+                <string>content</string>
+                <string>Test1a</string>
+              </entry>
+            </parameters>
+          </p>
+          <wikiDocument name="WebHome">
+            <p>
+              <parameters>
+                <entry>
+                  <string>syntax</string>
+                  <string>markdown+github/1.0</string>
+                </entry>
+                <entry>
+                  <string>content</string>
+                  <string>Test1a</string>
+                </entry>
+              </parameters>
+            </p>
+          </wikiDocument>
+        </wikiSpace>
+        <wikiSpace name="Test1b">
+          <p>
+            <parameters>
+              <entry>
+                <string>syntax</string>
+                <string>markdown+github/1.0</string>
+              </entry>
+              <entry>
+                <string>content</string>
+                <string>Test1b</string>
+              </entry>
+            </parameters>
+          </p>
+          <wikiDocument name="WebHome">
+            <p>
+              <parameters>
+                <entry>
+                  <string>syntax</string>
+                  <string>markdown+github/1.0</string>
+                </entry>
+                <entry>
+                  <string>content</string>
+                  <string>Test1b</string>
+                </entry>
+              </parameters>
+            </p>
+          </wikiDocument>
+        </wikiSpace>
+      </wikiSpace>
+      <wikiSpace name="Test2">
+        <p>
+          <parameters>
+            <entry>
+              <string>syntax</string>
+              <string>markdown+github/1.0</string>
+            </entry>
+            <entry>
+              <string>content</string>
+              <string>T2</string>
+            </entry>
+          </parameters>
+        </p>
+        <wikiDocument name="WebHome">
+          <p>
+            <parameters>
+              <entry>
+                <string>syntax</string>
+                <string>markdown+github/1.0</string>
+              </entry>
+              <entry>
+                <string>content</string>
+                <string>T2</string>
+              </entry>
+            </parameters>
+          </p>
+        </wikiDocument>
+      </wikiSpace>
+    </wikiSpace></wikiSpace></wikiSpace>
+.#------------------------------------------------------------------------------
+.input|githubimporter+wiki
+.configuration.source=TestRepo
+.configuration.parent=Space1.Space2.WebHome
+.configuration.createHierarchy=true
+.#------------------------------------------------------------------------------

@@ -92,6 +92,10 @@ public class GithubImporterInputFilterStream
 
     private static final String KEY_FILE_CREOLE = ".creole";
 
+    private static final String KEY_SPACE_STRING = "Space ";
+
+    private static final String KEY_SPACE_WEBHOME = ".WebHome";
+
     private static final String KEY_GIT_URL_TREE = "/tree/";
 
     private static final String KEY_GIT_URL_BLOB = "/blob/";
@@ -185,7 +189,10 @@ public class GithubImporterInputFilterStream
         File[] docArray = directory.listFiles(fileFilter);
         if (docArray != null) {
             Arrays.sort(docArray);
-            String parentReference = this.properties.getParent().toString().replaceAll("Space ", "");
+            String parentReference = this.properties.getParent().toString().replaceAll(KEY_SPACE_STRING, "");
+            if (parentReference.contains(KEY_SPACE_WEBHOME)) {
+                parentReference = parentReference.replace(KEY_SPACE_WEBHOME, "");
+            }
             String[] spaces = parentReference.split(KEY_DOT);
             for (int i = 0; i < spaces.length; i++) {
                 filterHandler.beginWikiSpace(spaces[i], FilterEventParameters.EMPTY);
@@ -314,7 +321,6 @@ public class GithubImporterInputFilterStream
         Map<String, String> additionalRepos = new HashMap<>();
         final boolean[] headingParent = {false};
         final String[] tempLineCatched = {""};
-        final String[] lastSpace = {""};
         try (Stream<String> linesStream = Files.lines(sidebar.toPath())) {
             linesStream.forEach(line -> {
                 if (line.trim().startsWith(KEY_BULLET_DASH) || line.trim().startsWith(KEY_BULLET_STERIC)) {
@@ -370,10 +376,18 @@ public class GithubImporterInputFilterStream
     private void addParentToHierarchy(ArrayList<String> hierarchy, GithubImporterFilter filterHandler)
             throws FilterException
     {
-        hierarchy.add(this.properties.getParent().getName());
-        filterHandler.beginWikiSpace(hierarchy.get(hierarchy.size() - 1),
-                FilterEventParameters.EMPTY);
-        createParentContent(this.properties.getParent().getName(), filterHandler);
+        String parentReference = this.properties.getParent().toString().replaceAll(KEY_SPACE_STRING, "");
+        if (parentReference.endsWith(KEY_SPACE_WEBHOME)) {
+            parentReference = parentReference.replace(KEY_SPACE_WEBHOME, "");
+        }
+        String[] spaces = parentReference.split(KEY_DOT);
+        for (int i = 0; i < spaces.length; i++) {
+            filterHandler.beginWikiSpace(spaces[i], FilterEventParameters.EMPTY);
+            if (i == spaces.length - 1) {
+                createParentContent(spaces[i], filterHandler);
+                hierarchy.add(spaces[i]);
+            }
+        }
     }
 
     private void readLevels(String line, Map<String, String> additionalRepos, File directory,
