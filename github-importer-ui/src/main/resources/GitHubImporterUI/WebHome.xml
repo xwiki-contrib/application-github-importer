@@ -58,8 +58,13 @@
         #end&#xd;
       #end&#xd;
       #if ($propertyName.startsWith('parent'))&#xd;
+        #if ($paramValue.endsWith('.WebHome'))&#xd;
+          #set ($paramValue = $paramValue.replace('.WebHome', ''))&#xd;
+        #end&#xd;
         #set ($parentName = $paramValue.substring($paramValue.lastIndexOf('.') + 1))&#xd;
-        #if ($xwiki.getSpaces().contains($parentName))&#xd;
+        #set($spaceQuery = "select count(space.name) from XWikiSpace as space where space.name='$parentName'")&#xd;
+        #set ($spaceFound = $services.query.xwql($spaceQuery).execute()[0])&#xd;
+        #if ($spaceFound > 0)&#xd;
           #set ($parentValidationError = "$services.localization.render('githubimporter.validation.parent')")&#xd;
         #end&#xd;
       #end&#xd;
