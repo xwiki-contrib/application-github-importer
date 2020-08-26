@@ -36,29 +36,32 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>githubimporter.sourcetype.title=Source Type&#xd;
-githubimporter.sourcetype.hint=This can be URL or File. (Note: Internet access is required for URL source)&#xd;
-githubimporter.sourcetype.url=URL&#xd;
-githubimporter.sourcetype.file=FILE / DIRECTORY&#xd;
-githubimporter.source.url.title=URL&#xd;
-githubimporter.source.url.hint=URL to the git repository. (e.g. https://github.com/Haxsen/TestRepo.wiki.git)&#xd;
-githubimporter.source.file.title=Path&#xd;
-githubimporter.source.file.hint=Path to the zip file / directory. Zip files must have a "zip" extension (file name ending in .zip). (e.g. /home/myuser/path/to/folder or /home/myuser/path/to/file.zip or E\:\\path\\to\\folder-or-zip)&#xd;
-githubimporter.parent.title=Parent Page&#xd;
-githubimporter.parent.hint=All of the imported pages will be created under this parent page.&#xd;
-githubimporter.authcode.title=Authentication Code&#xd;
-githubimporter.authcode.hint=(Required for private repository) This can be oauth / token / password used for authentication.&#xd;
-githubimporter.username.title=Username&#xd;
-githubimporter.username.hint=(Required for password only) The username used for authenticating with password.&#xd;
-githubimporter.convertsyntax.title=Convert to Default Syntax&#xd;
-githubimporter.convertsyntax.hint=The syntax of the pages will be converted to the Default Page Syntax which is set in Syntaxes (Administration).&#xd;
-githubimporter.createhierarchy.title=Create hierarchy of pages&#xd;
-githubimporter.createhierarchy.hint=Create the pages hierarchically according to their level defined in Sidebar (if exists).&#xd;
-githubimporter.validation.parent=Parent page already exists. Please specify a new parent.&#xd;
-githubimporter.job.info=A job for the import has started. Please wait until it has completed.&#xd;
-githubimporter.job.complete=Import completed.&#xd;
-githubimporter.job.error=An error has occurred during the import. Check the Job log for more information.&#xd;
-githubimporter.validation.required=(Required)&#xd;
+  <content>githubimporter.description.title=Description
+githubimporter.description=This application provides the ability to import and convert pages from GitHub to XWiki with various options. The following form provides the options to import the pages. More details on this extension and its usage are available on the [[Extension Page>>https://extensions.xwiki.org/xwiki/bin/view/Extension/GitHub%20Importer%20Application/]] on XWiki Extensions Wiki.
+githubimporter.description.options=Importer Options
+githubimporter.sourcetype.title=Source Type
+githubimporter.sourcetype.hint=This can be URL or a local File/Directory path. (Note: Internet access is required for URL source).
+githubimporter.sourcetype.url=URL
+githubimporter.sourcetype.file=FILE / DIRECTORY
+githubimporter.source.url.title=URL
+githubimporter.source.url.hint=URL to a git repository. (e.g. https://github.com/mixxxdj/mixxx.wiki.git).
+githubimporter.source.file.title=Path
+githubimporter.source.file.hint=Path to the zip file / directory. Zip files must have a "zip" extension (file name ending in .zip). (e.g. /home/myuser/path/to/directory or /home/myuser/path/to/file.zip or E\:\\path\\to\\directory-or-file.zip).
+githubimporter.parent.title=Parent Page
+githubimporter.parent.hint=All of the imported pages will be created under this parent page.
+githubimporter.authcode.title=Authentication Code
+githubimporter.authcode.hint=(Required for private repository) This can be an oauth, token or username to be used for authentication.
+githubimporter.username.title=Username
+githubimporter.username.hint=(Required with username only) The password of the username (if provided).
+githubimporter.convertsyntax.title=Convert to Default Syntax
+githubimporter.convertsyntax.hint=Imported pages will be converted to the default page syntax (see the Syntaxes section in the Administration).
+githubimporter.createhierarchy.title=Create hierarchy of pages
+githubimporter.createhierarchy.hint=Organize the imported pages hierarchically, following the heading levels defined in the GitHub Pages Sidebar (if it exists).
+githubimporter.validation.parent=Parent page already exists. Please specify a new parent.
+githubimporter.job.info=A job for the import has started. Please wait until it has completed.
+githubimporter.job.complete=Import completed.
+githubimporter.job.error=An error has occurred during the import. Check the Job log for more information.
+githubimporter.validation.required=(Required)
 githubimporter.button.import=Import</content>
   <object>
     <name>GitHub Importer.Code.Translations.WebHome</name>

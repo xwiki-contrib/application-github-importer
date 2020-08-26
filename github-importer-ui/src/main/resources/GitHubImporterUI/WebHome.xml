@@ -37,7 +37,11 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
   <content>{{velocity}}&#xd;
-#if ($request.import)&#xd;
+#if (!$request.import)&#xd;
+  = $services.localization.render('githubimporter.description.title') =&#xd;
+  $services.localization.render('githubimporter.description')&#xd;
+  = $services.localization.render('githubimporter.description.options') =&#xd;
+#else&#xd;
   ## Set input and output types for filter&#xd;
   #set($input = 'githubimporter+wiki')&#xd;
   #set($output = 'xwiki+instance')&#xd;
@@ -137,11 +141,12 @@
         &lt;dt>&#xd;
           &lt;label for="githubimporter_input_source_type">&#xd;
             $services.localization.render('githubimporter.sourcetype.title')&#xd;
+            &lt;span class="xRequired">$services.localization.render('githubimporter.validation.required')&lt;/span>&#xd;
           &lt;/label>&#xd;
           &lt;span class="xHint">$services.localization.render('githubimporter.sourcetype.hint')&lt;/span>&#xd;
         &lt;/dt>&#xd;
         &lt;dd>&#xd;
-          &lt;select name="githubimporter_sourcetype" id="githubimporter_sourcetype">&#xd;
+          &lt;select name="githubimporter_sourcetype" id="githubimporter_sourcetype" required>&#xd;
             &lt;option value="url" name="githubimporter_sourcetype_url" #if($request.get('githubimporter_sourcetype') == "url")selected #end>&#xd;
               $services.localization.render('githubimporter.sourcetype.url')&#xd;
             &lt;/option>&#xd;
