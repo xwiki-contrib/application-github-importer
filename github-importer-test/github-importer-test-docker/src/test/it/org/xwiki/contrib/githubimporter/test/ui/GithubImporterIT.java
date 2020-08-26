@@ -80,7 +80,7 @@ public class GithubImporterIT
 //        Select inputType = new Select(driver.findElement(By.id("filter_input_type")));
 //        inputType.selectByValue("githubimporter+wiki");
 
-        WebElement inputElement = driver.findElement(By.id("githubimporter_properties_descriptor_source"));
+        WebElement inputElement = driver.findElement(By.id("githubimporter_properties_descriptor_source_input"));
         String url = "https://github.com/Haxsen/TestRepo.wiki.git";
         inputElement.sendKeys(url);
 
@@ -92,7 +92,7 @@ public class GithubImporterIT
 //        outputType.selectByValue("xwiki+instance");
 
         // Start conversion
-        WebElement submit = driver.findElement(By.name("Import"));
+        WebElement submit = driver.findElement(By.name("import"));
         submit.click();
 
         // Wait for conversion (15 seconds)
