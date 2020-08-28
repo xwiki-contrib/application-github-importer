@@ -119,6 +119,8 @@ public class GithubImporterInputFilterStream
 
     private int parentLevel;
 
+    private int spaceLevel;
+
     @Inject
     private Logger logger;
 
@@ -145,6 +147,8 @@ public class GithubImporterInputFilterStream
     {
         InputSource inputSource = this.properties.getSource();
         if (inputSource != null) {
+            logger.info(String.format("The pages will be created under the reference: [%s]",
+                    this.properties.getParent().toString().replaceAll(KEY_SPACE_STRING, "")));
             File wikiRepoDirectory = null;
             if (inputSource instanceof URLInputSource) {
                 logger.warn("URL source!");
@@ -336,12 +340,14 @@ public class GithubImporterInputFilterStream
                 }
             });
             if (hierarchy.size() > 0) {
-                try {
-                    filterHandler.endWikiSpace(hierarchy.get(hierarchy.size() - 1), FilterEventParameters.EMPTY);
-                } catch (FilterException e) {
-                    logger.warn("couldnt end space for hierarchy > 0");
+                for (int j = hierarchy.size() - 1; j >= 0; j--) {
+                    try {
+                        filterHandler.endWikiSpace(hierarchy.get(hierarchy.size() - 1), FilterEventParameters.EMPTY);
+                    } catch (FilterException e) {
+                        logger.warn("couldnt end space for hierarchy > 0");
+                    }
+                    hierarchy.remove(hierarchy.size() - 1);
                 }
-                hierarchy.remove(hierarchy.size() - 1);
             }
         } catch (Exception e) {
             throw new FilterException(ERROR_SIDEBAR + ERROR_EXCEPTION, e);
@@ -382,10 +388,11 @@ public class GithubImporterInputFilterStream
         }
         String[] spaces = parentReference.split(KEY_DOT);
         for (int i = 0; i < spaces.length; i++) {
+            spaceLevel++;
             filterHandler.beginWikiSpace(spaces[i], FilterEventParameters.EMPTY);
+            hierarchy.add(spaces[i]);
             if (i == spaces.length - 1) {
                 createParentContent(spaces[i], filterHandler);
-                hierarchy.add(spaces[i]);
             }
         }
     }
@@ -428,10 +435,8 @@ public class GithubImporterInputFilterStream
             Repository repo = gitManager.getRepository(repoLink, getRepoName(repoLink),
                     this.properties.getUsername(), this.properties.getAuthCode());
             additionalRepos.put(getRepoName(repoLink), repo.getWorkTree().getAbsolutePath());
-            return new File(additionalRepos.get(getRepoName(repoLink)) + fileReference, pageName);
-        } else {
-            return new File(additionalRepos.get(getRepoName(repoLink)) + fileReference, pageName);
         }
+        return new File(additionalRepos.get(getRepoName(repoLink)) + fileReference, pageName);
     }
 
     private void readBulletLevel(int bulletLevel, File pageFile, ArrayList<String> hierarchy,
@@ -513,7 +518,7 @@ public class GithubImporterInputFilterStream
     private void startUnderlinedHeadingSpace(ArrayList<String> hierarchy, GithubImporterFilter filterHandler,
                                              String tempLineCatched)
     {
-        if (hierarchy.size() > 1) {
+        if (hierarchy.size() > spaceLevel) {
             try {
                 filterHandler.endWikiSpace(hierarchy.get(hierarchy.size() - 1),
                         FilterEventParameters.EMPTY);

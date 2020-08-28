@@ -450,7 +450,9 @@ Underscores&#xd;
           </p>
         </wikiDocument>
       </wikiSpace>
-    </wikiSpace></wikiSpace></wikiSpace>
+    </wikiSpace>
+  </wikiSpace>
+</wikiSpace>
 .#------------------------------------------------------------------------------
 .input|githubimporter+wiki
 .configuration.source=TestRepo

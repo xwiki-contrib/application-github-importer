@@ -45,6 +45,12 @@
     #if (!$jobStatus.logTail.hasLogLevel('ERROR'))
       &lt;div class="box successmessage"&gt;
         $services.localization.render('githubimporter.job.complete')
+        #set($parentLocation = $jobStatus.logTail.getLogEvent(1).toString())&#xd;
+        #set($parentLocation = $parentLocation.substring($parentLocation.indexOf("[")))&#xd;
+        #set($parentLocation = $parentLocation.substring(1, $parentLocation.indexOf("]")))&#xd;
+        #set($parentLocation = $parentLocation.replace(".","/"))&#xd;
+        #set($parentLocation = $parentLocation.replace("/WebHome",""))&#xd;
+      &lt;span class="wikilink">&lt;a href="/xwiki/bin/view/$parentLocation/">&lt;span class="wikigeneratedlinkcontent">$services.localization.render('githubimporter.job.output')&lt;/span>&lt;/a>&lt;/span>&#xd;
       &lt;/div&gt;
     #else
       &lt;div class="box errormessage"&gt;
