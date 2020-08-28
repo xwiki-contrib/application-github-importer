@@ -115,6 +115,10 @@ public class GithubImporterInputFilterStream
     private static final String ERROR_SIDEBAR = "Sidebar is unreadable or unsupported. Please uncheck Create Hierarchy"
             + " or fix the Sidebar. ";
 
+    private static final String ERROR_SIDEBAR_HEADING_START = "Failed creating space for heading. [{}]";
+
+    private static final String ERROR_SIDEBAR_HEADING_END = "Failed ending space for heading. [{}]";
+
     private String parentName = "";
 
     private int parentLevel;
@@ -147,12 +151,12 @@ public class GithubImporterInputFilterStream
     {
         InputSource inputSource = this.properties.getSource();
         if (inputSource != null) {
-            logger.info(String.format("The pages will be created under the reference: [%s]",
-                    this.properties.getParent().toString().replaceAll(KEY_SPACE_STRING, "")));
+            String parentReference = this.properties.getParent().toString().replaceAll(KEY_SPACE_STRING, "");
+            logger.info("The pages will be created under the reference: [[{}]]", parentReference);
             File wikiRepoDirectory = null;
             if (inputSource instanceof URLInputSource) {
-                logger.warn("URL source!");
                 String urlString = ((URLInputSource) inputSource).getURL().toString();
+                logger.info("Cloning git repository from [{}]", urlString);
                 Repository repo = gitManager.getRepository(urlString, getRepoName(urlString),
                     this.properties.getUsername(), this.properties.getAuthCode());
                 wikiRepoDirectory = repo.getWorkTree();
@@ -162,6 +166,7 @@ public class GithubImporterInputFilterStream
                 if (file.isDirectory()) {
                     wikiRepoDirectory = file;
                 } else if (file.getName().endsWith(KEY_ZIP)) {
+                    logger.info("Reading zip file from [{}]", file.getAbsolutePath());
                     fileCatcher.extractZip(file.getAbsolutePath(), getTemporaryDirectoryPath());
                     String tempPath = getTemporaryDirectoryPath() + KEY_FORWARD_SLASH
                             + file.getName().split(KEY_ZIP)[0];
@@ -176,8 +181,8 @@ public class GithubImporterInputFilterStream
                 }
             }
         } else {
-            throw new FilterException("Input source is not supported: [" + this.properties.getSource() + "] "
-                + "Please specify a valid Input source.");
+            throw new FilterException("Input source is empty or not supported: [" + this.properties.getSource() + "] "
+                + "Please specify a valid input source.");
         }
     }
 
@@ -217,6 +222,7 @@ public class GithubImporterInputFilterStream
         try {
             String fileContents = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
             if (this.properties.isConvertSyntax()) {
+                logger.info("Converting syntax from [{}] to default syntax.", syntaxId);
                 fileContents = syntaxConverter.getConvertedContent(fileContents, syntaxId);
             }
             String pageName = file.getName().split(KEY_DOT)[0];
@@ -248,8 +254,10 @@ public class GithubImporterInputFilterStream
     {
         File sidebar = new File(directory, "_Sidebar.md");
         if (!sidebar.exists() || !sidebar.canRead()) {
+            logger.info("Sidebar does not exist or is unreadable. Continuing without hierarchy.");
             readGitDirectory(directory, filterHandler);
         } else {
+            logger.info("Sidebar is found. Reading sidebar to create hierarchy of pages.");
             readSidebar(sidebar, directory, filterHandler);
         }
     }
@@ -344,7 +352,8 @@ public class GithubImporterInputFilterStream
                     try {
                         filterHandler.endWikiSpace(hierarchy.get(hierarchy.size() - 1), FilterEventParameters.EMPTY);
                     } catch (FilterException e) {
-                        logger.warn("couldnt end space for hierarchy > 0");
+                        logger.warn("Failed to end space for [{}] after reading hierarchy.",
+                                hierarchy.get(hierarchy.size() - 1));
                     }
                     hierarchy.remove(hierarchy.size() - 1);
                 }
@@ -407,7 +416,6 @@ public class GithubImporterInputFilterStream
             String pageDetailStart = line.substring(line.indexOf(KEY_SQUARE_BRACKET_START));
             String pageLink = pageDetailStart.substring(pageDetailStart.indexOf(KEY_SQUARE_BRACKET_END) + 2);
             String pageName = getPageName(pageLink);
-            logger.info("readLevels; pageName is " + pageName);
             if (pageName.equals("")) {
                 return;
             }
@@ -415,12 +423,11 @@ public class GithubImporterInputFilterStream
             try {
                 readBulletLevel(bulletLevel, pageFile, hierarchy, filterHandler);
             } catch (Exception e) {
-                logger.warn("exception at leveling");
+                logger.warn("Bullet level could not be read correctly. Please fix it. [{}].", e.getMessage());
             }
             parentLevel = bulletLevel;
             parentName = pageName.endsWith(KEY_FILE_MD) ? pageName.split(KEY_FILE_MD)[0] : pageName;
         } else if (!line.contains(KEY_SQUARE_BRACKET_START)) {
-            logger.info("is not [ type");
             String parentPageName = line.substring(line.indexOf(" "));
             parentLevel = bulletLevel;
             parentName = parentPageName;
@@ -432,6 +439,7 @@ public class GithubImporterInputFilterStream
         String fileReference = getSidebarFileReference(pageLink);
         String repoLink = pageLink.split(KEY_REGEX_TREE)[0] + KEY_URL_GIT;
         if (!additionalRepos.containsKey(getRepoName(repoLink))) {
+            logger.info("Cloning additional git repository as found in sidebar from [{}]", repoLink);
             Repository repo = gitManager.getRepository(repoLink, getRepoName(repoLink),
                     this.properties.getUsername(), this.properties.getAuthCode());
             additionalRepos.put(getRepoName(repoLink), repo.getWorkTree().getAbsolutePath());
@@ -442,17 +450,15 @@ public class GithubImporterInputFilterStream
     private void readBulletLevel(int bulletLevel, File pageFile, ArrayList<String> hierarchy,
                                  GithubImporterFilter filterHandler) throws FilterException
     {
-        logger.info("readBulletLevel;  ");
         if (bulletLevel > parentLevel) {
-            logger.info("Level++ , filePath is " + pageFile.getAbsolutePath());
+            logger.info("Bullet list level has risen. Moving space level deeper into [{}].", parentName);
             hierarchy.add(parentName);
             filterHandler.beginWikiSpace(hierarchy.get(hierarchy.size() - 1), FilterEventParameters.EMPTY);
         } else if (bulletLevel < parentLevel) {
-            logger.info("Level-- , filePath is " + pageFile.getAbsolutePath());
+            logger.info("Bullet list level has fallen. Moving space level out of [{}].",
+                    hierarchy.get(hierarchy.size() - 1));
             filterHandler.endWikiSpace(hierarchy.get(hierarchy.size() - 1), FilterEventParameters.EMPTY);
             hierarchy.remove(hierarchy.size() - 1);
-        } else {
-            logger.info("readBulletLevel; Levelelse ");
         }
         readFileType(pageFile, filterHandler);
     }
@@ -462,10 +468,8 @@ public class GithubImporterInputFilterStream
     {
         if ((line.contains(KEY_GIT_URL_BLOB) || line.contains(KEY_GIT_URL_TREE))
                 && pageName.endsWith(KEY_FILE_MD)) {
-            logger.info("readLevels; blob/tree ");
             return getAdditionalRepoFile(pageLink, additionalRepos, pageName);
         } else {
-            logger.info("readLevels; wiki ");
             String pageFileName = pageName + KEY_FILE_MD;
             return new File(directory, pageFileName);
         }
@@ -480,7 +484,7 @@ public class GithubImporterInputFilterStream
                 filterHandler.endWikiSpace(hierarchy.get(hierarchy.size() - 1),
                         FilterEventParameters.EMPTY);
             } catch (FilterException e) {
-                e.printStackTrace();
+                logger.warn(ERROR_SIDEBAR_HEADING_END, e.getMessage());
             }
             hierarchy.remove(hierarchy.size() - 1);
         }
@@ -489,7 +493,7 @@ public class GithubImporterInputFilterStream
             filterHandler.beginWikiSpace(hierarchy.get(hierarchy.size() - 1), FilterEventParameters.EMPTY);
             createParentContent(hierarchy.get(hierarchy.size() - 1), filterHandler);
         } catch (FilterException e) {
-            logger.warn("error creating space in headParent #");
+            logger.warn(ERROR_SIDEBAR_HEADING_START, e.getMessage());
         }
         return true;
     }
@@ -502,15 +506,14 @@ public class GithubImporterInputFilterStream
         if (pageFileName.contains(KEY_HASH)) {
             pageFileName = pageFileName.substring(0, pageFileName.lastIndexOf(KEY_HASH));
         }
-        logger.info("[[ type; filename is " + pageFileName + KEY_FILE_MD);
+        String fileNameMd = pageFileName + KEY_FILE_MD;
         try {
-            readFileType(new File(directory, pageFileName + KEY_FILE_MD), filterHandler);
+            readFileType(new File(directory, fileNameMd), filterHandler);
         } catch (Exception e) {
-            logger.warn("error reading [[ type, trying using - dash");
             try {
-                readFileType(new File(directory, pageFileName.replace(" ", "-") + KEY_FILE_MD), filterHandler);
+                readFileType(new File(directory, fileNameMd.replace(" ", "-")), filterHandler);
             } catch (Exception e2) {
-                logger.warn("didnt work using - dash, skipping file");
+                logger.warn("File not found named as [{}]. Skipping this file as it does not exist.", fileNameMd);
             }
         }
     }
@@ -524,7 +527,7 @@ public class GithubImporterInputFilterStream
                         FilterEventParameters.EMPTY);
                 hierarchy.remove(hierarchy.size() - 1);
             } catch (Exception e) {
-                logger.warn("couldnt end space for -- type heading");
+                logger.warn(ERROR_SIDEBAR_HEADING_END, e.getMessage());
             }
         }
         try {
@@ -532,7 +535,7 @@ public class GithubImporterInputFilterStream
             filterHandler.beginWikiSpace(hierarchy.get(hierarchy.size() - 1), FilterEventParameters.EMPTY);
             createParentContent(hierarchy.get(hierarchy.size() - 1), filterHandler);
         } catch (Exception e) {
-            logger.warn("couldnt create space for -- type heading");
+            logger.warn(ERROR_SIDEBAR_HEADING_START, e.getMessage());
         }
     }
 }
