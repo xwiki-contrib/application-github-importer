@@ -50,7 +50,7 @@ githubimporter.source.file.hint=Path to the zip file / directory. Zip files must
 githubimporter.parent.title=Parent Page
 githubimporter.parent.hint=All of the imported pages will be created under this parent page.
 githubimporter.authenticator.title=Authenticator
-githubimporter.authenticator.hint=(Required for private repository) This can be a Personal Access Token, Client Secret (OAuth), or Username to be used for authentication. Personal Access Token is recommended, see <a href="https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token">Creating a personal access token</a> page on GitHub Docs.
+githubimporter.authenticator.hint=(Required for private repository) This can be a Personal Access Token, Client Secret (OAuth), or Username to be used for authentication. Personal Access Token is recommended, see {0}Creating a personal access token{1} page on GitHub Docs.
 githubimporter.password.title=Password
 githubimporter.password.hint=(Required with username only) The password of the user.
 githubimporter.convertsyntax.title=Convert to Default Syntax

@@ -194,7 +194,9 @@
         &lt;/dd>&#xd;
         &lt;dt>&#xd;
           &lt;label for="githubimporter_properties_descriptor_username">$services.localization.render('githubimporter.authenticator.title')&lt;/label>&#xd;
-          &lt;span class="xHint">$services.localization.render('githubimporter.authenticator.hint')&lt;/span>&#xd;
+          &lt;span class="xHint">$services.localization.render('githubimporter.authenticator.hint',&#xd;
+            ['&lt;a href="https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token">', '&lt;/a>'])&#xd;
+          &lt;/span>&#xd;
         &lt;/dt>&#xd;
         &lt;dd>&#xd;
           &lt;input id="githubimporter_properties_descriptor_username" name="githubimporter_properties_descriptor_username" type="text"&#xd;
