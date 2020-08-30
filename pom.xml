@@ -31,7 +31,7 @@
 
   <groupId>org.xwiki.contrib.github-importer</groupId>
   <artifactId>github-importer</artifactId>
-  <version>1.5</version>
+  <version>1.6-SNAPSHOT</version>
   <name>Application GitHub Importer - Parent POM</name>
   <description>Parent POM for GitHub Importer modules</description>
   <packaging>pom</packaging>
@@ -44,7 +44,7 @@
     <connection>scm:git:git://github.com/xwiki-contrib/application-github-importer.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki-contrib/application-github-importer.git</developerConnection>
     <url>https://github.com/xwiki-contrib/application-github-importer/tree/master</url>
-    <tag>github-importer-1.5</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <developers>
