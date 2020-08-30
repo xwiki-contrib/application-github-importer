@@ -1280,6 +1280,34 @@ Underscores&#xd;
       </wikiDocument>
     </wikiSpace>
   </wikiSpace>
+  <wikiSpace name="LICENSE">
+    <p>
+      <parameters>
+        <entry>
+          <string>syntax</string>
+          <string>plain/1.0</string>
+        </entry>
+        <entry>
+          <string>content</string>
+          <string>this is a license file</string>
+        </entry>
+      </parameters>
+    </p>
+    <wikiDocument name="WebHome">
+      <p>
+        <parameters>
+          <entry>
+            <string>syntax</string>
+            <string>plain/1.0</string>
+          </entry>
+          <entry>
+            <string>content</string>
+            <string>this is a license file</string>
+          </entry>
+        </parameters>
+      </p>
+    </wikiDocument>
+  </wikiSpace>
   <wikiSpace name="MediaWikiPage">
     <p>
       <parameters>

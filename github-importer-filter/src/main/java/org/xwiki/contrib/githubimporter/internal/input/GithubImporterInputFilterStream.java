@@ -72,7 +72,9 @@ public class GithubImporterInputFilterStream
 
     private static final String KEY_FORWARD_SLASH = "/";
 
-    private static final String KEY_DOT = "\\.";
+    private static final String KEY_DOT = ".";
+
+    private static final String KEY_DOT_REGEX = "\\.";
 
     private static final String KEY_MARKDOWN_GITHUB = "markdown+github/1.0";
 
@@ -81,6 +83,8 @@ public class GithubImporterInputFilterStream
     private static final String KEY_CREOLE_SYNTAX = "creole/1.0";
 
     private static final String KEY_XWIKI_SYNTAX = "xwiki/2.1";
+
+    private static final String KEY_PLAIN_SYNTAX = "plain/1.0";
 
     private static final String KEY_WEBHOME = "WebHome";
 
@@ -152,7 +156,7 @@ public class GithubImporterInputFilterStream
         InputSource inputSource = this.properties.getSource();
         if (inputSource != null) {
             String parentReference = this.properties.getParent().toString().replaceAll(KEY_SPACE_STRING, "");
-            logger.info("The pages will be created under the reference: [[{}]]", parentReference);
+            logger.info("The pages will be created under the reference: [{}]", parentReference);
             File wikiRepoDirectory = null;
             if (inputSource instanceof URLInputSource) {
                 String urlString = ((URLInputSource) inputSource).getURL().toString();
@@ -194,7 +198,7 @@ public class GithubImporterInputFilterStream
 
     private void readGitDirectory(File directory, GithubImporterFilter filterHandler) throws FilterException
     {
-        FileFilter fileFilter = file -> (!file.getName().startsWith(".") && !file.getName().startsWith("_"));
+        FileFilter fileFilter = file -> (!file.getName().startsWith(KEY_DOT) && !file.getName().startsWith("_"));
         File[] docArray = directory.listFiles(fileFilter);
         if (docArray != null) {
             Arrays.sort(docArray);
@@ -202,7 +206,7 @@ public class GithubImporterInputFilterStream
             if (parentReference.contains(KEY_SPACE_WEBHOME)) {
                 parentReference = parentReference.replace(KEY_SPACE_WEBHOME, "");
             }
-            String[] spaces = parentReference.split(KEY_DOT);
+            String[] spaces = parentReference.split(KEY_DOT_REGEX);
             for (int i = 0; i < spaces.length; i++) {
                 filterHandler.beginWikiSpace(spaces[i], FilterEventParameters.EMPTY);
                 if (i == spaces.length - 1) {
@@ -225,7 +229,7 @@ public class GithubImporterInputFilterStream
                 logger.info("Converting syntax from [{}] to default syntax.", syntaxId);
                 fileContents = syntaxConverter.getConvertedContent(fileContents, syntaxId);
             }
-            String pageName = file.getName().split(KEY_DOT)[0];
+            String pageName = file.getName().split(KEY_DOT_REGEX)[0];
             filterParams.put(WikiDocumentFilter.PARAMETER_CONTENT, fileContents);
             filterHandler.beginWikiSpace(pageName, filterParams);
             filterHandler.beginWikiDocument(KEY_WEBHOME, filterParams);
@@ -315,13 +319,13 @@ public class GithubImporterInputFilterStream
         } else {
             if (file.getName().endsWith(KEY_FILE_MD)) {
                 readFile(file, getSyntaxParameters(KEY_MARKDOWN_GITHUB), KEY_MARKDOWN_GITHUB, filterHandler);
-            }
-            if (file.getName().endsWith(KEY_FILE_MEDIAWIKI)) {
+            } else if (file.getName().endsWith(KEY_FILE_MEDIAWIKI)) {
                 readFile(file, getSyntaxParameters(KEY_MEDIAWIKI_SYNTAX), KEY_MEDIAWIKI_SYNTAX,
                         filterHandler);
-            }
-            if (file.getName().endsWith(KEY_FILE_CREOLE)) {
+            } else if (file.getName().endsWith(KEY_FILE_CREOLE)) {
                 readFile(file, getSyntaxParameters(KEY_CREOLE_SYNTAX), KEY_CREOLE_SYNTAX, filterHandler);
+            } else if (!file.getName().contains(KEY_DOT)) {
+                readFile(file, getSyntaxParameters(KEY_PLAIN_SYNTAX), KEY_PLAIN_SYNTAX, filterHandler);
             }
         }
     }
@@ -395,7 +399,7 @@ public class GithubImporterInputFilterStream
         if (parentReference.endsWith(KEY_SPACE_WEBHOME)) {
             parentReference = parentReference.replace(KEY_SPACE_WEBHOME, "");
         }
-        String[] spaces = parentReference.split(KEY_DOT);
+        String[] spaces = parentReference.split(KEY_DOT_REGEX);
         for (int i = 0; i < spaces.length; i++) {
             spaceLevel++;
             filterHandler.beginWikiSpace(spaces[i], FilterEventParameters.EMPTY);

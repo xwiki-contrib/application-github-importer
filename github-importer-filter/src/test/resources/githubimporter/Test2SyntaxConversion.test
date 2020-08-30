@@ -123,18 +123,16 @@ Strikethrough uses two tildes. --Scratch this.--
 ⋅⋅⋅To have a line break without a paragraph, you will need to use two trailing spaces.⋅⋅ ⋅⋅⋅Note that this line is separate, but within the same paragraph.⋅⋅ ⋅⋅⋅(This is contrary to the typical GFM line break behaviour, where trailing spaces are not required.)
 
 * Unordered list can use asterisks
-
 * Or minuses
-
 * Or pluses
 
 [[I'm an inline-style link>>https://www.google.com]]
 
-[[I'm an inline-style link with title>>https://www.google.com||title="Google's Homepage"]]
+[[I'm an inline-style link with title>>https://www.google.com]]
 
 [[I'm a reference-style link>>https://www.mozilla.org]]
 
-[[I'm a relative reference to a repository file>>../blob/master/LICENSE]]
+[[I'm a relative reference to a repository file>>page:./LICENSE]]
 
 [[You can use numbers for reference-style link definitions>>http://slashdot.org]]
 
@@ -146,9 +144,9 @@ Some text to show that the reference links can follow later.
 
 Here's our logo (hover to see the title text):
 
-Inline-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png||alt="alt text" title="Logo Title Text 1"]]
+Inline-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png||alt="alt text"]]
 
-Reference-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png||title="Logo Title Text 2"]]
+Reference-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png]]
 
 Inline {{code language="none"}}code{{/code}} has {{code language="none"}}back-ticks around{{/code}} it.
 
@@ -169,10 +167,10 @@ But let's throw in a &lt;b>tag&lt;/b>.
 
 Colons can be used to align columns.
 
-|=Tables|=(% align="center" %)Are|=(% align="right" %)Cool
-|col 3 is|(% align="center" %)right-aligned|(% align="right" %)$1600
-|col 2 is|(% align="center" %)centered|(% align="right" %)$12
-|zebra stripes|(% align="center" %)are neat|(% align="right" %)$1
+|=Tables|=Are|=Cool
+|col 3 is|right-aligned|$1600
+|col 2 is|centered|$12
+|zebra stripes|are neat|$1
 
 There must be at least 3 dashes separating each header cell. The outer pipes (|) are optional, and you don't need to make the raw Markdown line up prettily. You can also use inline Markdown.
 
@@ -247,18 +245,16 @@ Strikethrough uses two tildes. --Scratch this.--
 ⋅⋅⋅To have a line break without a paragraph, you will need to use two trailing spaces.⋅⋅ ⋅⋅⋅Note that this line is separate, but within the same paragraph.⋅⋅ ⋅⋅⋅(This is contrary to the typical GFM line break behaviour, where trailing spaces are not required.)
 
 * Unordered list can use asterisks
-
 * Or minuses
-
 * Or pluses
 
 [[I'm an inline-style link>>https://www.google.com]]
 
-[[I'm an inline-style link with title>>https://www.google.com||title="Google's Homepage"]]
+[[I'm an inline-style link with title>>https://www.google.com]]
 
 [[I'm a reference-style link>>https://www.mozilla.org]]
 
-[[I'm a relative reference to a repository file>>../blob/master/LICENSE]]
+[[I'm a relative reference to a repository file>>page:./LICENSE]]
 
 [[You can use numbers for reference-style link definitions>>http://slashdot.org]]
 
@@ -270,9 +266,9 @@ Some text to show that the reference links can follow later.
 
 Here's our logo (hover to see the title text):
 
-Inline-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png||alt="alt text" title="Logo Title Text 1"]]
+Inline-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png||alt="alt text"]]
 
-Reference-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png||title="Logo Title Text 2"]]
+Reference-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png]]
 
 Inline {{code language="none"}}code{{/code}} has {{code language="none"}}back-ticks around{{/code}} it.
 
@@ -293,10 +289,10 @@ But let's throw in a &lt;b>tag&lt;/b>.
 
 Colons can be used to align columns.
 
-|=Tables|=(% align="center" %)Are|=(% align="right" %)Cool
-|col 3 is|(% align="center" %)right-aligned|(% align="right" %)$1600
-|col 2 is|(% align="center" %)centered|(% align="right" %)$12
-|zebra stripes|(% align="center" %)are neat|(% align="right" %)$1
+|=Tables|=Are|=Cool
+|col 3 is|right-aligned|$1600
+|col 2 is|centered|$12
+|zebra stripes|are neat|$1
 
 There must be at least 3 dashes separating each header cell. The outer pipes (|) are optional, and you don't need to make the raw Markdown line up prettily. You can also use inline Markdown.
 
@@ -386,18 +382,16 @@ Strikethrough uses two tildes. --Scratch this.--
 ⋅⋅⋅To have a line break without a paragraph, you will need to use two trailing spaces.⋅⋅ ⋅⋅⋅Note that this line is separate, but within the same paragraph.⋅⋅ ⋅⋅⋅(This is contrary to the typical GFM line break behaviour, where trailing spaces are not required.)
 
 * Unordered list can use asterisks
-
 * Or minuses
-
 * Or pluses
 
 [[I'm an inline-style link>>https://www.google.com]]
 
-[[I'm an inline-style link with title>>https://www.google.com||title="Google's Homepage"]]
+[[I'm an inline-style link with title>>https://www.google.com]]
 
 [[I'm a reference-style link>>https://www.mozilla.org]]
 
-[[I'm a relative reference to a repository file>>../blob/master/LICENSE]]
+[[I'm a relative reference to a repository file>>page:./LICENSE]]
 
 [[You can use numbers for reference-style link definitions>>http://slashdot.org]]
 
@@ -409,9 +403,9 @@ Some text to show that the reference links can follow later.
 
 Here's our logo (hover to see the title text):
 
-Inline-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png||alt="alt text" title="Logo Title Text 1"]]
+Inline-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png||alt="alt text"]]
 
-Reference-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png||title="Logo Title Text 2"]]
+Reference-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png]]
 
 Inline {{code language="none"}}code{{/code}} has {{code language="none"}}back-ticks around{{/code}} it.
 
@@ -432,10 +426,10 @@ But let's throw in a &lt;b>tag&lt;/b>.
 
 Colons can be used to align columns.
 
-|=Tables|=(% align="center" %)Are|=(% align="right" %)Cool
-|col 3 is|(% align="center" %)right-aligned|(% align="right" %)$1600
-|col 2 is|(% align="center" %)centered|(% align="right" %)$12
-|zebra stripes|(% align="center" %)are neat|(% align="right" %)$1
+|=Tables|=Are|=Cool
+|col 3 is|right-aligned|$1600
+|col 2 is|centered|$12
+|zebra stripes|are neat|$1
 
 There must be at least 3 dashes separating each header cell. The outer pipes (|) are optional, and you don't need to make the raw Markdown line up prettily. You can also use inline Markdown.
 
@@ -508,18 +502,16 @@ Strikethrough uses two tildes. --Scratch this.--
 ⋅⋅⋅To have a line break without a paragraph, you will need to use two trailing spaces.⋅⋅ ⋅⋅⋅Note that this line is separate, but within the same paragraph.⋅⋅ ⋅⋅⋅(This is contrary to the typical GFM line break behaviour, where trailing spaces are not required.)
 
 * Unordered list can use asterisks
-
 * Or minuses
-
 * Or pluses
 
 [[I'm an inline-style link>>https://www.google.com]]
 
-[[I'm an inline-style link with title>>https://www.google.com||title="Google's Homepage"]]
+[[I'm an inline-style link with title>>https://www.google.com]]
 
 [[I'm a reference-style link>>https://www.mozilla.org]]
 
-[[I'm a relative reference to a repository file>>../blob/master/LICENSE]]
+[[I'm a relative reference to a repository file>>page:./LICENSE]]
 
 [[You can use numbers for reference-style link definitions>>http://slashdot.org]]
 
@@ -531,9 +523,9 @@ Some text to show that the reference links can follow later.
 
 Here's our logo (hover to see the title text):
 
-Inline-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png||alt="alt text" title="Logo Title Text 1"]]
+Inline-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png||alt="alt text"]]
 
-Reference-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png||title="Logo Title Text 2"]]
+Reference-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png]]
 
 Inline {{code language="none"}}code{{/code}} has {{code language="none"}}back-ticks around{{/code}} it.
 
@@ -554,10 +546,10 @@ But let's throw in a &lt;b>tag&lt;/b>.
 
 Colons can be used to align columns.
 
-|=Tables|=(% align="center" %)Are|=(% align="right" %)Cool
-|col 3 is|(% align="center" %)right-aligned|(% align="right" %)$1600
-|col 2 is|(% align="center" %)centered|(% align="right" %)$12
-|zebra stripes|(% align="center" %)are neat|(% align="right" %)$1
+|=Tables|=Are|=Cool
+|col 3 is|right-aligned|$1600
+|col 2 is|centered|$12
+|zebra stripes|are neat|$1
 
 There must be at least 3 dashes separating each header cell. The outer pipes (|) are optional, and you don't need to make the raw Markdown line up prettily. You can also use inline Markdown.
 
@@ -649,18 +641,16 @@ Strikethrough uses two tildes. --Scratch this.--
 ⋅⋅⋅To have a line break without a paragraph, you will need to use two trailing spaces.⋅⋅ ⋅⋅⋅Note that this line is separate, but within the same paragraph.⋅⋅ ⋅⋅⋅(This is contrary to the typical GFM line break behaviour, where trailing spaces are not required.)
 
 * Unordered list can use asterisks
-
 * Or minuses
-
 * Or pluses
 
 [[I'm an inline-style link>>https://www.google.com]]
 
-[[I'm an inline-style link with title>>https://www.google.com||title="Google's Homepage"]]
+[[I'm an inline-style link with title>>https://www.google.com]]
 
 [[I'm a reference-style link>>https://www.mozilla.org]]
 
-[[I'm a relative reference to a repository file>>../blob/master/LICENSE]]
+[[I'm a relative reference to a repository file>>page:./LICENSE]]
 
 [[You can use numbers for reference-style link definitions>>http://slashdot.org]]
 
@@ -672,9 +662,9 @@ Some text to show that the reference links can follow later.
 
 Here's our logo (hover to see the title text):
 
-Inline-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png||alt="alt text" title="Logo Title Text 1"]]
+Inline-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png||alt="alt text"]]
 
-Reference-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png||title="Logo Title Text 2"]]
+Reference-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png]]
 
 Inline {{code language="none"}}code{{/code}} has {{code language="none"}}back-ticks around{{/code}} it.
 
@@ -695,10 +685,10 @@ But let's throw in a &lt;b>tag&lt;/b>.
 
 Colons can be used to align columns.
 
-|=Tables|=(% align="center" %)Are|=(% align="right" %)Cool
-|col 3 is|(% align="center" %)right-aligned|(% align="right" %)$1600
-|col 2 is|(% align="center" %)centered|(% align="right" %)$12
-|zebra stripes|(% align="center" %)are neat|(% align="right" %)$1
+|=Tables|=Are|=Cool
+|col 3 is|right-aligned|$1600
+|col 2 is|centered|$12
+|zebra stripes|are neat|$1
 
 There must be at least 3 dashes separating each header cell. The outer pipes (|) are optional, and you don't need to make the raw Markdown line up prettily. You can also use inline Markdown.
 
@@ -773,18 +763,16 @@ Strikethrough uses two tildes. --Scratch this.--
 ⋅⋅⋅To have a line break without a paragraph, you will need to use two trailing spaces.⋅⋅ ⋅⋅⋅Note that this line is separate, but within the same paragraph.⋅⋅ ⋅⋅⋅(This is contrary to the typical GFM line break behaviour, where trailing spaces are not required.)
 
 * Unordered list can use asterisks
-
 * Or minuses
-
 * Or pluses
 
 [[I'm an inline-style link>>https://www.google.com]]
 
-[[I'm an inline-style link with title>>https://www.google.com||title="Google's Homepage"]]
+[[I'm an inline-style link with title>>https://www.google.com]]
 
 [[I'm a reference-style link>>https://www.mozilla.org]]
 
-[[I'm a relative reference to a repository file>>../blob/master/LICENSE]]
+[[I'm a relative reference to a repository file>>page:./LICENSE]]
 
 [[You can use numbers for reference-style link definitions>>http://slashdot.org]]
 
@@ -796,9 +784,9 @@ Some text to show that the reference links can follow later.
 
 Here's our logo (hover to see the title text):
 
-Inline-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png||alt="alt text" title="Logo Title Text 1"]]
+Inline-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png||alt="alt text"]]
 
-Reference-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png||title="Logo Title Text 2"]]
+Reference-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png]]
 
 Inline {{code language="none"}}code{{/code}} has {{code language="none"}}back-ticks around{{/code}} it.
 
@@ -819,10 +807,10 @@ But let's throw in a &lt;b>tag&lt;/b>.
 
 Colons can be used to align columns.
 
-|=Tables|=(% align="center" %)Are|=(% align="right" %)Cool
-|col 3 is|(% align="center" %)right-aligned|(% align="right" %)$1600
-|col 2 is|(% align="center" %)centered|(% align="right" %)$12
-|zebra stripes|(% align="center" %)are neat|(% align="right" %)$1
+|=Tables|=Are|=Cool
+|col 3 is|right-aligned|$1600
+|col 2 is|centered|$12
+|zebra stripes|are neat|$1
 
 There must be at least 3 dashes separating each header cell. The outer pipes (|) are optional, and you don't need to make the raw Markdown line up prettily. You can also use inline Markdown.
 
@@ -916,18 +904,16 @@ Strikethrough uses two tildes. --Scratch this.--
 ⋅⋅⋅To have a line break without a paragraph, you will need to use two trailing spaces.⋅⋅ ⋅⋅⋅Note that this line is separate, but within the same paragraph.⋅⋅ ⋅⋅⋅(This is contrary to the typical GFM line break behaviour, where trailing spaces are not required.)
 
 * Unordered list can use asterisks
-
 * Or minuses
-
 * Or pluses
 
 [[I'm an inline-style link>>https://www.google.com]]
 
-[[I'm an inline-style link with title>>https://www.google.com||title="Google's Homepage"]]
+[[I'm an inline-style link with title>>https://www.google.com]]
 
 [[I'm a reference-style link>>https://www.mozilla.org]]
 
-[[I'm a relative reference to a repository file>>../blob/master/LICENSE]]
+[[I'm a relative reference to a repository file>>page:./LICENSE]]
 
 [[You can use numbers for reference-style link definitions>>http://slashdot.org]]
 
@@ -939,9 +925,9 @@ Some text to show that the reference links can follow later.
 
 Here's our logo (hover to see the title text):
 
-Inline-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png||alt="alt text" title="Logo Title Text 1"]]
+Inline-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png||alt="alt text"]]
 
-Reference-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png||title="Logo Title Text 2"]]
+Reference-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png]]
 
 Inline {{code language="none"}}code{{/code}} has {{code language="none"}}back-ticks around{{/code}} it.
 
@@ -962,10 +948,10 @@ But let's throw in a &lt;b>tag&lt;/b>.
 
 Colons can be used to align columns.
 
-|=Tables|=(% align="center" %)Are|=(% align="right" %)Cool
-|col 3 is|(% align="center" %)right-aligned|(% align="right" %)$1600
-|col 2 is|(% align="center" %)centered|(% align="right" %)$12
-|zebra stripes|(% align="center" %)are neat|(% align="right" %)$1
+|=Tables|=Are|=Cool
+|col 3 is|right-aligned|$1600
+|col 2 is|centered|$12
+|zebra stripes|are neat|$1
 
 There must be at least 3 dashes separating each header cell. The outer pipes (|) are optional, and you don't need to make the raw Markdown line up prettily. You can also use inline Markdown.
 
@@ -1040,18 +1026,16 @@ Strikethrough uses two tildes. --Scratch this.--
 ⋅⋅⋅To have a line break without a paragraph, you will need to use two trailing spaces.⋅⋅ ⋅⋅⋅Note that this line is separate, but within the same paragraph.⋅⋅ ⋅⋅⋅(This is contrary to the typical GFM line break behaviour, where trailing spaces are not required.)
 
 * Unordered list can use asterisks
-
 * Or minuses
-
 * Or pluses
 
 [[I'm an inline-style link>>https://www.google.com]]
 
-[[I'm an inline-style link with title>>https://www.google.com||title="Google's Homepage"]]
+[[I'm an inline-style link with title>>https://www.google.com]]
 
 [[I'm a reference-style link>>https://www.mozilla.org]]
 
-[[I'm a relative reference to a repository file>>../blob/master/LICENSE]]
+[[I'm a relative reference to a repository file>>page:./LICENSE]]
 
 [[You can use numbers for reference-style link definitions>>http://slashdot.org]]
 
@@ -1063,9 +1047,9 @@ Some text to show that the reference links can follow later.
 
 Here's our logo (hover to see the title text):
 
-Inline-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png||alt="alt text" title="Logo Title Text 1"]]
+Inline-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png||alt="alt text"]]
 
-Reference-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png||title="Logo Title Text 2"]]
+Reference-style: [[image:https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png]]
 
 Inline {{code language="none"}}code{{/code}} has {{code language="none"}}back-ticks around{{/code}} it.
 
@@ -1086,10 +1070,10 @@ But let's throw in a &lt;b>tag&lt;/b>.
 
 Colons can be used to align columns.
 
-|=Tables|=(% align="center" %)Are|=(% align="right" %)Cool
-|col 3 is|(% align="center" %)right-aligned|(% align="right" %)$1600
-|col 2 is|(% align="center" %)centered|(% align="right" %)$12
-|zebra stripes|(% align="center" %)are neat|(% align="right" %)$1
+|=Tables|=Are|=Cool
+|col 3 is|right-aligned|$1600
+|col 2 is|centered|$12
+|zebra stripes|are neat|$1
 
 There must be at least 3 dashes separating each header cell. The outer pipes (|) are optional, and you don't need to make the raw Markdown line up prettily. You can also use inline Markdown.
 
@@ -1121,6 +1105,26 @@ Underscores</string>
         </p>
       </wikiDocument>
     </wikiSpace>
+  </wikiSpace>
+  <wikiSpace name="LICENSE">
+    <p>
+      <parameters>
+        <entry>
+          <string>content</string>
+          <string>this is a license file</string>
+        </entry>
+      </parameters>
+    </p>
+    <wikiDocument name="WebHome">
+      <p>
+        <parameters>
+          <entry>
+            <string>content</string>
+            <string>this is a license file</string>
+          </entry>
+        </parameters>
+      </p>
+    </wikiDocument>
   </wikiSpace>
   <wikiSpace name="MediaWikiPage">
     <p>

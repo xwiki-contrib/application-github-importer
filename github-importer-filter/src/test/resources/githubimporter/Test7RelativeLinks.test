@@ -1,0 +1,53 @@
+.#------------------------------------------------------------------------------
+.expect|filter+xml
+.#------------------------------------------------------------------------------
+<wikiSpace name="GitImp">
+  <wikiDocument name="WebHome">
+    <p>
+      <parameters>
+        <entry>
+          <string>syntax</string>
+          <string>xwiki/2.1</string>
+        </entry>
+        <entry>
+          <string>content</string>
+          <string>{{documents location="GitImp." columns="doc.title,doc.location,doc.date"}}</string>
+        </entry>
+      </parameters>
+    </p>
+  </wikiDocument>
+  <wikiSpace name="RelativeLinks">
+    <p>
+      <parameters>
+        <entry>
+          <string>content</string>
+          <string>Relative links are as follows: [[Overview>>page:../pages/overview]]. [[how to make an independent website>>page:./independent_site]].
+
+Different types: React is [[MIT licensed>>page:.././LICENSE]]. From root [[License file>>page:./LICENSE]].
+
+Not relative links: [[GitHub>>www.github.com]]. [[GitHub>>https://www.github.com]].</string>
+        </entry>
+      </parameters>
+    </p>
+    <wikiDocument name="WebHome">
+      <p>
+        <parameters>
+          <entry>
+            <string>content</string>
+            <string>Relative links are as follows: [[Overview>>page:../pages/overview]]. [[how to make an independent website>>page:./independent_site]].
+
+Different types: React is [[MIT licensed>>page:.././LICENSE]]. From root [[License file>>page:./LICENSE]].
+
+Not relative links: [[GitHub>>www.github.com]]. [[GitHub>>https://www.github.com]].</string>
+          </entry>
+        </parameters>
+      </p>
+    </wikiDocument>
+  </wikiSpace>
+</wikiSpace>
+.#------------------------------------------------------------------------------
+.input|githubimporter+wiki
+.configuration.source=RelativeLinks
+.configuration.parent=GitImp
+.configuration.convertSyntax=true
+.#------------------------------------------------------------------------------
