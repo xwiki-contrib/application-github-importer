@@ -220,7 +220,7 @@ public class GithubImporterInputFilterStream
         }
     }
 
-    private void readFile(File file, FilterEventParameters filterParams, String syntaxId,
+    private void readFile(File file, String pageName, FilterEventParameters filterParams, String syntaxId,
                           GithubImporterFilter filterHandler) throws FilterException
     {
         try {
@@ -229,7 +229,6 @@ public class GithubImporterInputFilterStream
                 logger.info("Converting syntax from [{}] to default syntax.", syntaxId);
                 fileContents = syntaxConverter.getConvertedContent(fileContents, syntaxId);
             }
-            String pageName = file.getName().split(KEY_DOT_REGEX)[0];
             filterParams.put(WikiDocumentFilter.PARAMETER_CONTENT, fileContents);
             filterHandler.beginWikiSpace(pageName, filterParams);
             filterHandler.beginWikiDocument(KEY_WEBHOME, filterParams);
@@ -277,7 +276,10 @@ public class GithubImporterInputFilterStream
                     readDirectoryRecursive(file.listFiles(), filterHandler);
                     filterHandler.endWikiSpace(file.getName(), FilterEventParameters.EMPTY);
                 } else {
-                    readFileType(file, filterHandler);
+                    String fileName = file.getName();
+                    int dotIndex = fileName.lastIndexOf(KEY_DOT);
+                    String pageName = dotIndex < 0 ? fileName : fileName.substring(0, dotIndex);
+                    readFileType(file, pageName, filterHandler);
                 }
             }
         }
@@ -309,7 +311,7 @@ public class GithubImporterInputFilterStream
         filterHandler.endWikiDocument(KEY_WEBHOME, filterParams);
     }
 
-    private void readFileType(File file, GithubImporterFilter filterHandler) throws FilterException
+    private void readFileType(File file, String pageName, GithubImporterFilter filterHandler) throws FilterException
     {
         if (file.isDirectory()) {
             filterHandler.beginWikiSpace(file.getName(), FilterEventParameters.EMPTY);
@@ -318,14 +320,14 @@ public class GithubImporterInputFilterStream
             filterHandler.endWikiSpace(file.getName(), FilterEventParameters.EMPTY);
         } else {
             if (file.getName().endsWith(KEY_FILE_MD)) {
-                readFile(file, getSyntaxParameters(KEY_MARKDOWN_GITHUB), KEY_MARKDOWN_GITHUB, filterHandler);
+                readFile(file, pageName, getSyntaxParameters(KEY_MARKDOWN_GITHUB), KEY_MARKDOWN_GITHUB, filterHandler);
             } else if (file.getName().endsWith(KEY_FILE_MEDIAWIKI)) {
-                readFile(file, getSyntaxParameters(KEY_MEDIAWIKI_SYNTAX), KEY_MEDIAWIKI_SYNTAX,
+                readFile(file, pageName, getSyntaxParameters(KEY_MEDIAWIKI_SYNTAX), KEY_MEDIAWIKI_SYNTAX,
                         filterHandler);
             } else if (file.getName().endsWith(KEY_FILE_CREOLE)) {
-                readFile(file, getSyntaxParameters(KEY_CREOLE_SYNTAX), KEY_CREOLE_SYNTAX, filterHandler);
+                readFile(file, pageName, getSyntaxParameters(KEY_CREOLE_SYNTAX), KEY_CREOLE_SYNTAX, filterHandler);
             } else if (!file.getName().contains(KEY_DOT)) {
-                readFile(file, getSyntaxParameters(KEY_PLAIN_SYNTAX), KEY_PLAIN_SYNTAX, filterHandler);
+                readFile(file, pageName, getSyntaxParameters(KEY_PLAIN_SYNTAX), KEY_PLAIN_SYNTAX, filterHandler);
             }
         }
     }
@@ -378,7 +380,12 @@ public class GithubImporterInputFilterStream
         return fileReference;
     }
 
-    private String getPageName(String pageLink)
+    private String getPageName(String pageDetailStart)
+    {
+        return pageDetailStart.substring(1, pageDetailStart.indexOf(KEY_SQUARE_BRACKET_END));
+    }
+
+    private String getFileNameFromLink(String pageLink)
     {
         String pageName = "";
         if (pageLink.startsWith("http")) {
@@ -388,7 +395,6 @@ public class GithubImporterInputFilterStream
         if (pageName.equals("wiki")) {
             pageName = "Home";
         }
-
         return pageName;
     }
 
@@ -419,13 +425,14 @@ public class GithubImporterInputFilterStream
         if (line.contains(KEY_SQUARE_BRACKET_START) && line.contains("github.com")) {
             String pageDetailStart = line.substring(line.indexOf(KEY_SQUARE_BRACKET_START));
             String pageLink = pageDetailStart.substring(pageDetailStart.indexOf(KEY_SQUARE_BRACKET_END) + 2);
-            String pageName = getPageName(pageLink);
+            String pageName = getPageName(pageDetailStart);
+            String fileName = getFileNameFromLink(pageLink);
             if (pageName.equals("")) {
                 return;
             }
-            File pageFile = getFileFromHierarchy(line, pageName, pageLink, additionalRepos, directory);
+            File pageFile = getFileFromHierarchy(line, fileName, pageLink, additionalRepos, directory);
             try {
-                readBulletLevel(bulletLevel, pageFile, hierarchy, filterHandler);
+                readBulletLevel(bulletLevel, pageName, pageFile, hierarchy, filterHandler);
             } catch (Exception e) {
                 logger.warn("Bullet level could not be read correctly. Please fix it. [{}].", e.getMessage());
             }
@@ -451,7 +458,7 @@ public class GithubImporterInputFilterStream
         return new File(additionalRepos.get(getRepoName(repoLink)) + fileReference, pageName);
     }
 
-    private void readBulletLevel(int bulletLevel, File pageFile, ArrayList<String> hierarchy,
+    private void readBulletLevel(int bulletLevel, String pageName, File pageFile, ArrayList<String> hierarchy,
                                  GithubImporterFilter filterHandler) throws FilterException
     {
         if (bulletLevel > parentLevel) {
@@ -464,7 +471,7 @@ public class GithubImporterInputFilterStream
             filterHandler.endWikiSpace(hierarchy.get(hierarchy.size() - 1), FilterEventParameters.EMPTY);
             hierarchy.remove(hierarchy.size() - 1);
         }
-        readFileType(pageFile, filterHandler);
+        readFileType(pageFile, pageName, filterHandler);
     }
 
     private File getFileFromHierarchy(String line, String pageName, String pageLink,
@@ -512,10 +519,14 @@ public class GithubImporterInputFilterStream
         }
         String fileNameMd = pageFileName + KEY_FILE_MD;
         try {
-            readFileType(new File(directory, fileNameMd), filterHandler);
+            File pageFile = new File(directory, fileNameMd);
+            String pageName = pageFile.getName();
+            readFileType(pageFile, pageName.substring(0, pageName.lastIndexOf(KEY_DOT)), filterHandler);
         } catch (Exception e) {
             try {
-                readFileType(new File(directory, fileNameMd.replace(" ", "-")), filterHandler);
+                File pageFile = new File(directory, fileNameMd.replace(" ", "-"));
+                String pageName = pageFile.getName();
+                readFileType(pageFile, pageName.substring(0, pageName.lastIndexOf(KEY_DOT)), filterHandler);
             } catch (Exception e2) {
                 logger.warn("File not found named as [{}]. Skipping this file as it does not exist.", fileNameMd);
             }

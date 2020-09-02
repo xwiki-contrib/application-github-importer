@@ -1,0 +1,197 @@
+.#------------------------------------------------------------------------------
+.expect|filter+xml
+.#------------------------------------------------------------------------------
+<wikiSpace name="GitImp">
+  <wikiDocument name="WebHome">
+    <p>
+      <parameters>
+        <entry>
+          <string>syntax</string>
+          <string>xwiki/2.1</string>
+        </entry>
+        <entry>
+          <string>content</string>
+          <string>{{documents location="GitImp." columns="doc.title,doc.location,doc.date"}}</string>
+        </entry>
+      </parameters>
+    </p>
+  </wikiDocument>
+  <wikiSpace name="HomeX">
+    <p>
+      <parameters>
+        <entry>
+          <string>syntax</string>
+          <string>markdown+github/1.0</string>
+        </entry>
+        <entry>
+          <string>content</string>
+          <string>A simple home page.</string>
+        </entry>
+      </parameters>
+    </p>
+    <wikiDocument name="WebHome">
+      <p>
+        <parameters>
+          <entry>
+            <string>syntax</string>
+            <string>markdown+github/1.0</string>
+          </entry>
+          <entry>
+            <string>content</string>
+            <string>A simple home page.</string>
+          </entry>
+        </parameters>
+      </p>
+    </wikiDocument>
+  </wikiSpace>
+  <wikiSpace name="TestsX">
+    <p>
+      <parameters>
+        <entry>
+          <string>syntax</string>
+          <string>markdown+github/1.0</string>
+        </entry>
+        <entry>
+          <string>content</string>
+          <string>Ts</string>
+        </entry>
+      </parameters>
+    </p>
+    <wikiDocument name="WebHome">
+      <p>
+        <parameters>
+          <entry>
+            <string>syntax</string>
+            <string>markdown+github/1.0</string>
+          </entry>
+          <entry>
+            <string>content</string>
+            <string>Ts</string>
+          </entry>
+        </parameters>
+      </p>
+    </wikiDocument>
+  </wikiSpace>
+  <wikiSpace name="TestsX">
+    <wikiSpace name="Test1X">
+      <p>
+        <parameters>
+          <entry>
+            <string>syntax</string>
+            <string>markdown+github/1.0</string>
+          </entry>
+          <entry>
+            <string>content</string>
+            <string># T1</string>
+          </entry>
+        </parameters>
+      </p>
+      <wikiDocument name="WebHome">
+        <p>
+          <parameters>
+            <entry>
+              <string>syntax</string>
+              <string>markdown+github/1.0</string>
+            </entry>
+            <entry>
+              <string>content</string>
+              <string># T1</string>
+            </entry>
+          </parameters>
+        </p>
+      </wikiDocument>
+    </wikiSpace>
+    <wikiSpace name="Test1X">
+      <wikiSpace name="Test1aX">
+        <p>
+          <parameters>
+            <entry>
+              <string>syntax</string>
+              <string>markdown+github/1.0</string>
+            </entry>
+            <entry>
+              <string>content</string>
+              <string>Test1a</string>
+            </entry>
+          </parameters>
+        </p>
+        <wikiDocument name="WebHome">
+          <p>
+            <parameters>
+              <entry>
+                <string>syntax</string>
+                <string>markdown+github/1.0</string>
+              </entry>
+              <entry>
+                <string>content</string>
+                <string>Test1a</string>
+              </entry>
+            </parameters>
+          </p>
+        </wikiDocument>
+      </wikiSpace>
+      <wikiSpace name="Test1bX">
+        <p>
+          <parameters>
+            <entry>
+              <string>syntax</string>
+              <string>markdown+github/1.0</string>
+            </entry>
+            <entry>
+              <string>content</string>
+              <string>Test1b</string>
+            </entry>
+          </parameters>
+        </p>
+        <wikiDocument name="WebHome">
+          <p>
+            <parameters>
+              <entry>
+                <string>syntax</string>
+                <string>markdown+github/1.0</string>
+              </entry>
+              <entry>
+                <string>content</string>
+                <string>Test1b</string>
+              </entry>
+            </parameters>
+          </p>
+        </wikiDocument>
+      </wikiSpace>
+    </wikiSpace>
+    <wikiSpace name="Test2X">
+      <p>
+        <parameters>
+          <entry>
+            <string>syntax</string>
+            <string>markdown+github/1.0</string>
+          </entry>
+          <entry>
+            <string>content</string>
+            <string>T2</string>
+          </entry>
+        </parameters>
+      </p>
+      <wikiDocument name="WebHome">
+        <p>
+          <parameters>
+            <entry>
+              <string>syntax</string>
+              <string>markdown+github/1.0</string>
+            </entry>
+            <entry>
+              <string>content</string>
+              <string>T2</string>
+            </entry>
+          </parameters>
+        </p>
+      </wikiDocument>
+    </wikiSpace>
+  </wikiSpace>
+</wikiSpace>
+.#------------------------------------------------------------------------------
+.input|githubimporter+wiki
+.configuration.source=TestRepoSidebarNames
+.configuration.parent=GitImp
+.configuration.createHierarchy=true
+.#------------------------------------------------------------------------------
