@@ -114,6 +114,8 @@ public class GithubImporterInputFilterStream
 
     private static final String KEY_HASH = "#";
 
+    private static final String KEY_SQUARE_BRACKET_START_DOUBLE = "[[";
+
     private static final String KEY_REGEX_TREE = "(/blob/)|(/tree/)";
 
     private static final String ERROR_SIDEBAR = "Sidebar is unreadable or unsupported. Please uncheck Create Hierarchy"
@@ -345,7 +347,7 @@ public class GithubImporterInputFilterStream
                     readLevels(line, additionalRepos, directory, hierarchy, filterHandler);
                 } else if (line.trim().startsWith(KEY_HASH)) {
                     headingParent[0] = readHeadingTypeLevel(line, headingParent[0], filterHandler, hierarchy);
-                } else if (line.trim().startsWith("[[")) {
+                } else if (line.trim().startsWith(KEY_SQUARE_BRACKET_START_DOUBLE)) {
                     readDirectHeadingFile(line, directory, filterHandler);
                 } else if (line.startsWith("---")) {
                     startUnderlinedHeadingSpace(hierarchy, filterHandler, tempLineCatched[0]);
@@ -513,6 +515,7 @@ public class GithubImporterInputFilterStream
     {
         int nameIndex = line.lastIndexOf("|");
         nameIndex = nameIndex < 0 ? nameIndex + 3 : nameIndex + 1;
+        String pageName = line.substring(line.indexOf(KEY_SQUARE_BRACKET_START_DOUBLE) + 2, nameIndex - 1);
         String pageFileName = line.substring(nameIndex, line.lastIndexOf("]]"));
         if (pageFileName.contains(KEY_HASH)) {
             pageFileName = pageFileName.substring(0, pageFileName.lastIndexOf(KEY_HASH));
@@ -520,13 +523,11 @@ public class GithubImporterInputFilterStream
         String fileNameMd = pageFileName + KEY_FILE_MD;
         try {
             File pageFile = new File(directory, fileNameMd);
-            String pageName = pageFile.getName();
-            readFileType(pageFile, pageName.substring(0, pageName.lastIndexOf(KEY_DOT)), filterHandler);
+            readFileType(pageFile, pageName, filterHandler);
         } catch (Exception e) {
             try {
                 File pageFile = new File(directory, fileNameMd.replace(" ", "-"));
-                String pageName = pageFile.getName();
-                readFileType(pageFile, pageName.substring(0, pageName.lastIndexOf(KEY_DOT)), filterHandler);
+                readFileType(pageFile, pageName, filterHandler);
             } catch (Exception e2) {
                 logger.warn("File not found named as [{}]. Skipping this file as it does not exist.", fileNameMd);
             }
