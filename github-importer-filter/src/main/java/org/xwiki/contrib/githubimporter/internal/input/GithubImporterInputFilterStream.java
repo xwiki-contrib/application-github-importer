@@ -162,9 +162,10 @@ public class GithubImporterInputFilterStream
             File wikiRepoDirectory = null;
             if (inputSource instanceof URLInputSource) {
                 String urlString = ((URLInputSource) inputSource).getURL().toString();
-                logger.info("Cloning git repository from [{}]", urlString);
+                logger.info("Cloning git repository from [{}]. Please wait until the process is complete.", urlString);
                 Repository repo = gitManager.getRepository(urlString, getRepoName(urlString),
                     this.properties.getUsername(), this.properties.getAuthCode());
+                logger.info("Repository cloning process has been completed.");
                 wikiRepoDirectory = repo.getWorkTree();
             } else if (inputSource instanceof FileInputSource) {
                 File file = ((FileInputSource) inputSource).getFile();
