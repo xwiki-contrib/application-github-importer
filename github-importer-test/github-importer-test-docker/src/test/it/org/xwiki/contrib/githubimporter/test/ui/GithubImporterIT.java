@@ -19,17 +19,23 @@
  */
 package org.xwiki.contrib.githubimporter.test.ui;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testcontainers.shaded.com.google.common.io.Resources;
+import org.testcontainers.shaded.org.apache.commons.io.FileUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.panels.test.po.ApplicationsPanel;
@@ -80,9 +86,20 @@ public class GithubImporterIT
 //        Select inputType = new Select(driver.findElement(By.id("filter_input_type")));
 //        inputType.selectByValue("githubimporter+wiki");
 
-        WebElement inputElement = driver.findElement(By.id("githubimporter_properties_descriptor_source_input"));
-        String url = "https://github.com/Haxsen/TestRepo.wiki.git";
-        inputElement.sendKeys(url);
+        // Select type to File / Directory
+        WebElement inputType = driver.findElement(By.name("githubimporter_sourcetype"));
+        inputType.click();
+        inputType = driver.findElement(By.name("githubimporter_sourcetype_file"));
+        inputType.click();
+
+        // Get resource url to use it as path for input source
+        URL resourceURL = getClass().getResource("/TestRepository");
+        WebElement inputElement = driver.findElement(By.id("githubimporter_properties_descriptor_source_file_input"));
+        inputElement.sendKeys(resourceURL.getPath());
+
+//        WebElement inputElement = driver.findElement(By.id("githubimporter_properties_descriptor_source_input"));
+//        String url = "https://github.com/Haxsen/TestRepo.wiki.git";
+//        inputElement.sendKeys(url);
 
         inputElement = driver.findElement(By.id("githubimporter_properties_descriptor_parent"));
         inputElement.sendKeys("GithubImporterTestParent");
@@ -96,20 +113,103 @@ public class GithubImporterIT
         submit.click();
 
         // Wait for conversion (15 seconds)
+        // convertJob.join() is a possible alternative
         // @TODO: Use better implementation when available on Filter Module
-        Thread.sleep(15*1000);
+        Thread.sleep(9*1000);
 
         // Check the output
 //        ViewPage viewPage = setup.gotoPage("GithubImporterTestParent","WebHome");
 //        viewPage = setup.gotoPage("Home","WebHome");
-        EntityReference importedReference = new DocumentReference("xwiki",
-            Arrays.asList("GithubImporterTestParent", "Home"), "WebHome");
-        ViewPage viewPage = setup.gotoPage(importedReference);
-        String pageContent = viewPage.getContent();
-        URL resourceURL = getClass().getResource("/TestWikiRepository/Home.resource");
-        String resourceContent = Resources.toString(resourceURL, StandardCharsets.UTF_8);
 //        String content = IOUtils.resourceToString(resourceURL.getFile(), Charset.defaultCharset());
 //        FileUtils.readFileToString();
+
+        // Go to the imported pages and assert their content
+        EntityReference importedReference = new DocumentReference("xwiki",
+                Arrays.asList("GithubImporterTestParent", "Home"), "WebHome");
+        ViewPage viewPage = setup.gotoPage(importedReference);
+        String pageContent = viewPage.editWiki().getContent();
+        resourceURL = getClass().getResource("/importGithubWiki/Home.resource");
+        File resourceFile = new File(resourceURL.getPath());
+        String resourceContent = new String(Files.readAllBytes(resourceFile.toPath()));
+//        pageContent = pageContent + "\n";
+//        resourceContent = StringUtils.chop(resourceContent);
+//        FileUtils.writeStringToFile(new File("importGithubWikiHome1.txt"), resourceContent, StandardCharsets.UTF_8);
+//        FileUtils.writeStringToFile(new File("importGithubWikiHome2.txt"), pageContent, StandardCharsets.UTF_8);
+        Assert.assertEquals(resourceContent, pageContent);
+
+        importedReference = new DocumentReference("xwiki",
+                Arrays.asList("GithubImporterTestParent", "Tests"), "WebHome");
+        viewPage = setup.gotoPage(importedReference);
+        pageContent = viewPage.editWiki().getContent();
+        resourceURL = getClass().getResource("/importGithubWiki/Tests.resource");
+        resourceFile = new File(resourceURL.getPath());
+        resourceContent = new String(Files.readAllBytes(resourceFile.toPath()));
+        Assert.assertEquals(resourceContent, pageContent);
+
+        importedReference = new DocumentReference("xwiki",
+                Arrays.asList("GithubImporterTestParent", "Tests", "Test1"), "WebHome");
+        viewPage = setup.gotoPage(importedReference);
+        pageContent = viewPage.editWiki().getContent();
+        resourceURL = getClass().getResource("/importGithubWiki/Test1.resource");
+        resourceFile = new File(resourceURL.getPath());
+        resourceContent = new String(Files.readAllBytes(resourceFile.toPath()));
+        Assert.assertEquals(resourceContent, pageContent);
+
+        importedReference = new DocumentReference("xwiki",
+                Arrays.asList("GithubImporterTestParent", "Tests", "Test2"), "WebHome");
+        viewPage = setup.gotoPage(importedReference);
+        pageContent = viewPage.editWiki().getContent();
+        resourceURL = getClass().getResource("/importGithubWiki/Test2.resource");
+        resourceFile = new File(resourceURL.getPath());
+        resourceContent = new String(Files.readAllBytes(resourceFile.toPath()));
+        Assert.assertEquals(resourceContent, pageContent);
+    }
+
+    @Test
+    @Order(3)
+    public void importGithubPages(TestUtils setup, XWikiWebDriver driver)
+            throws IOException, InterruptedException
+    {
+        EntityReference ghImporterReference = new DocumentReference("xwiki", "GitHub Importer", "WebHome");
+        setup.gotoPage(ghImporterReference);
+
+        // Select type to File / Directory
+        WebElement inputType = driver.findElement(By.name("githubimporter_sourcetype"));
+        inputType.click();
+        inputType = driver.findElement(By.name("githubimporter_sourcetype_file"));
+        inputType.click();
+        // Uncheck syntax conversion
+        inputType = driver.findElement(By.name("githubimporter_properties_descriptor_convertSyntax"));
+        inputType.click();
+        // Uncheck create hierarchy
+        inputType = driver.findElement(By.name("githubimporter_properties_descriptor_createHierarchy"));
+        inputType.click();
+
+        // Get resource url to use it as path for input source
+        URL resourceURL = getClass().getResource("/TestRepository");
+        WebElement inputElement = driver.findElement(By.id("githubimporter_properties_descriptor_source_file_input"));
+        inputElement.sendKeys(resourceURL.getPath());
+
+        inputElement = driver.findElement(By.id("githubimporter_properties_descriptor_parent"));
+        inputElement.sendKeys("GithubImporterTestParentNoHierarchyNoConversion");
+
+        // Start conversion
+        WebElement submit = driver.findElement(By.name("import"));
+        submit.click();
+
+        // @TODO: Use better implementation when available on Filter Module
+        Thread.sleep(9*1000);
+
+        // Go to the imported pages and assert their content
+        EntityReference importedReference = new DocumentReference("xwiki",
+                Arrays.asList("GithubImporterTestParentNoHierarchyNoConversion", "Home"), "WebHome");
+        ViewPage viewPage = setup.gotoPage(importedReference);
+        String pageContent = viewPage.editWiki().getContent();
+        resourceURL = getClass().getResource("/TestRepository/Home.md");
+        File resourceFile = new File(resourceURL.getPath());
+        String resourceContent = new String(Files.readAllBytes(resourceFile.toPath()));
+//        FileUtils.writeStringToFile(new File("importGithubPagesHome1.txt"), resourceContent, StandardCharsets.UTF_8);
+//        FileUtils.writeStringToFile(new File("importGithubPagesHome2.txt"), pageContent, StandardCharsets.UTF_8);
         Assert.assertEquals(resourceContent, pageContent);
     }
 }

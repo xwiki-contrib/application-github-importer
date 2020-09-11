@@ -1,0 +1,6 @@
+* [Home](https://github.com/Haxsen/TestRepo/wiki)
+* [Tests](https://github.com/Haxsen/TestRepo/wiki/Tests)
+  * [Test1](https://github.com/Haxsen/TestRepo/wiki/Test1)
+    * [Test1a](https://github.com/Haxsen/TestRepo/wiki/Test1a)
+    * [Test1b](https://github.com/Haxsen/TestRepo/wiki/Test1b)
+  * [Test2](https://github.com/Haxsen/TestRepo/wiki/Test2)
