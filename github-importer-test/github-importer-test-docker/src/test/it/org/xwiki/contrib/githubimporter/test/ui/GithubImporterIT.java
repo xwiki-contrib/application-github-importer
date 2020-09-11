@@ -112,7 +112,7 @@ public class GithubImporterIT
         WebElement submit = driver.findElement(By.name("import"));
         submit.click();
 
-        // Wait for conversion (15 seconds)
+        // Wait for conversion (9 seconds)
         // convertJob.join() is a possible alternative
         // @TODO: Use better implementation when available on Filter Module
         Thread.sleep(9*1000);
@@ -208,8 +208,43 @@ public class GithubImporterIT
         resourceURL = getClass().getResource("/TestRepository/Home.md");
         File resourceFile = new File(resourceURL.getPath());
         String resourceContent = new String(Files.readAllBytes(resourceFile.toPath()));
-//        FileUtils.writeStringToFile(new File("importGithubPagesHome1.txt"), resourceContent, StandardCharsets.UTF_8);
-//        FileUtils.writeStringToFile(new File("importGithubPagesHome2.txt"), pageContent, StandardCharsets.UTF_8);
+        Assert.assertEquals(resourceContent, pageContent);
+
+        importedReference = new DocumentReference("xwiki",
+                Arrays.asList("GithubImporterTestParentNoHierarchyNoConversion", "CreolePage"), "WebHome");
+        viewPage = setup.gotoPage(importedReference);
+        pageContent = viewPage.editWiki().getContent();
+        resourceURL = getClass().getResource("/TestRepository/CreolePage.creole");
+        resourceFile = new File(resourceURL.getPath());
+        resourceContent = new String(Files.readAllBytes(resourceFile.toPath()));
+        Assert.assertEquals(resourceContent, pageContent);
+
+        importedReference = new DocumentReference("xwiki",
+                Arrays.asList("GithubImporterTestParentNoHierarchyNoConversion", "MediaWikiPage"), "WebHome");
+        viewPage = setup.gotoPage(importedReference);
+        pageContent = viewPage.editWiki().getContent();
+        resourceURL = getClass().getResource("/TestRepository/MediaWikiPage.mediawiki");
+        resourceFile = new File(resourceURL.getPath());
+        resourceContent = new String(Files.readAllBytes(resourceFile.toPath()));
+        Assert.assertEquals(resourceContent, pageContent);
+
+        importedReference = new DocumentReference("xwiki",
+                Arrays.asList("GithubImporterTestParentNoHierarchyNoConversion", "Level1", "Level1Home"), "WebHome");
+        viewPage = setup.gotoPage(importedReference);
+        pageContent = viewPage.editWiki().getContent();
+        resourceURL = getClass().getResource("/TestRepository/Level1/Level1Home.md");
+        resourceFile = new File(resourceURL.getPath());
+        resourceContent = new String(Files.readAllBytes(resourceFile.toPath()));
+        Assert.assertEquals(resourceContent, pageContent);
+
+        importedReference = new DocumentReference("xwiki",
+                Arrays.asList("GithubImporterTestParentNoHierarchyNoConversion", "Level1", "Level2", "Level2Home"),
+                "WebHome");
+        viewPage = setup.gotoPage(importedReference);
+        pageContent = viewPage.editWiki().getContent();
+        resourceURL = getClass().getResource("/TestRepository/Level1/Level2/Level2Home.md");
+        resourceFile = new File(resourceURL.getPath());
+        resourceContent = new String(Files.readAllBytes(resourceFile.toPath()));
         Assert.assertEquals(resourceContent, pageContent);
     }
 }
