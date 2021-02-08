@@ -44,6 +44,8 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.ViewPage;
 
+
+// Start with the code
 /**
  * Functional tests to prove the working of GitHub Importer Filter.
  *
