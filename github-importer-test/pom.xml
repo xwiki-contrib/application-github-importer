@@ -24,14 +24,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform</artifactId>
-        <version>12.4</version>
+        <groupId>org.xwiki.contrib.github-importer</groupId>
+        <artifactId>github-importer</artifactId>
+        <version>1.7-SNAPSHOT</version>
     </parent>
 
-    <groupId>org.xwiki.contrib.github-importer</groupId>
     <artifactId>github-importer-test</artifactId>
-  <version>12.4</version>
     <name>GitHub Importer - Tests - Parent POM</name>
     <packaging>pom</packaging>
     <description>GitHub Importer - Tests - Parent POM</description>
