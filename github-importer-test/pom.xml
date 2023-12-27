@@ -22,18 +22,15 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <groupId>org.xwiki.contrib.github-importer</groupId>
         <artifactId>github-importer</artifactId>
         <version>1.7-SNAPSHOT</version>
     </parent>
-
     <artifactId>github-importer-test</artifactId>
     <name>GitHub Importer - Tests - Parent POM</name>
     <packaging>pom</packaging>
     <description>GitHub Importer - Tests - Parent POM</description>
-
     <properties>
         <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
         <xwiki.revapi.skip>true</xwiki.revapi.skip>
@@ -41,11 +38,9 @@
         <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
         <xwiki.enforcer.skip>true</xwiki.enforcer.skip>
     </properties>
-
 <!--    <modules>-->
 <!--        <module>github-importer-test-pageobjects</module>-->
 <!--    </modules>-->
-
     <profiles>
         <profile>
             <id>docker</id>

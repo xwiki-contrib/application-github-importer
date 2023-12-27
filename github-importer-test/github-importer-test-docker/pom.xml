@@ -22,24 +22,20 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <groupId>org.xwiki.contrib.github-importer</groupId>
         <artifactId>github-importer-test</artifactId>
         <version>1.7-SNAPSHOT</version>
     </parent>
-
     <artifactId>github-importer-test-docker</artifactId>
     <name>GitHub Importer - Tests - Functional Tests</name>
     <packaging>jar</packaging>
     <description>GitHub Importer - Functional Tests in Docker</description>
-
     <properties>
         <!-- Functional tests are allowed to output content to the console -->
         <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
         <!-- START: Required to fix conflicts resolution between XWiki & TestContainers -->
     </properties>
-
     <dependencies>
         <!-- ================================
              Dependencies for tested features
@@ -67,7 +63,6 @@
             <version>${platform.version}</version>
             <type>xar</type>
         </dependency>
-
         <!-- ================================
              Test only dependencies
              ================================ -->
@@ -101,7 +96,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
     <build>
         <testSourceDirectory>src/test/it</testSourceDirectory>
         <plugins>
@@ -119,7 +113,6 @@
             </plugin>
         </plugins>
     </build>
-
     <profiles>
         <profile>
             <id>clover</id>
@@ -151,5 +144,4 @@
             </build>
         </profile>
     </profiles>
-
 </project>

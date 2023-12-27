@@ -161,7 +161,8 @@ class GithubImporterIT
 
     @Test
     @Order(3)
-    void importGithubPages(TestUtils setup, XWikiWebDriver driver) throws IOException, InterruptedException
+    public void importGithubPages(TestUtils setup, XWikiWebDriver driver)
+        throws IOException, InterruptedException
     {
         EntityReference ghImporterReference = new DocumentReference("xwiki", "GitHub Importer", "WebHome");
         setup.gotoPage(ghImporterReference);

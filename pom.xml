@@ -22,43 +22,36 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
   <parent>
     <groupId>org.xwiki.contrib</groupId>
     <artifactId>parent-platform</artifactId>
-    <version>12.10-1</version>
+    <version>13.10</version>
   </parent>
-
   <groupId>org.xwiki.contrib.github-importer</groupId>
   <artifactId>github-importer</artifactId>
   <version>1.7-SNAPSHOT</version>
   <name>Application GitHub Importer - Parent POM</name>
   <description>Parent POM for GitHub Importer modules</description>
   <packaging>pom</packaging>
-
   <properties>
     <xwiki.issueManagement.jira.id>GHIMPORT</xwiki.issueManagement.jira.id>
   </properties>
-
   <scm>
     <connection>scm:git:git://github.com/xwiki-contrib/application-github-importer.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki-contrib/application-github-importer.git</developerConnection>
     <url>https://github.com/xwiki-contrib/application-github-importer/tree/master</url>
     <tag>HEAD</tag>
   </scm>
-
   <developers>
     <developer>
       <id>haxsen</id>
       <name>Hassan Ali</name>
     </developer>
   </developers>
-
   <modules>
     <module>github-importer-filter</module>
     <module>github-importer-ui</module>
   </modules>
-
   <profiles>
     <profile>
       <id>integration-tests</id>
@@ -67,4 +60,23 @@
       </modules>
     </profile>
   </profiles>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <!-- Use a more recent version of Spoon to avoid URL classloader issue with Java 17 -->
+        <plugin>
+          <groupId>fr.inria.gforge.spoon</groupId>
+          <artifactId>spoon-maven-plugin</artifactId>
+          <version>3.8.0</version>
+          <dependencies>
+            <dependency>
+              <groupId>fr.inria.gforge.spoon</groupId>
+              <artifactId>spoon-core</artifactId>
+              <version>10.4.2</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 </project>
